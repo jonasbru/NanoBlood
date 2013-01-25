@@ -17,8 +17,8 @@ import java.lang.reflect.Field;
  */
 public class Main extends StateBasedGame{
 
-    static int height = 650;
-    static int width = 1200;
+    static int height = 720;
+    static int width = 1280;
     static boolean fullscreen = false;
     static boolean showFPS = true;
     static String title = "NanoBlood";
