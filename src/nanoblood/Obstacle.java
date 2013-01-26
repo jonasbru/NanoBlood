@@ -9,6 +9,7 @@ import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Circle;
 
 /**
  *
@@ -23,6 +24,9 @@ public class Obstacle extends StaticObject {
     Animation staticA;
 
     public Obstacle() throws SlickException {
+
+        this.boundingBox = new Circle((int) this.coords.getX(), (int) this.coords.getX(), 20); //TODO changer
+        
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {
             anim[i] = Sprite.getImage("sprites/obstacles/coffee/coffe" + Sprite.intToString(i, 5) + ".png");

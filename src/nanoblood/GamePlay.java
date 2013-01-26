@@ -23,8 +23,8 @@ public class GamePlay extends BasicGameState {
     Player player;
     LevelManager levelManager;
     List<StaticObject> objects;
-    int bloodSpeed = 0;
-    final int bloodSpeedImpulse = 20;
+    float bloodSpeed = 0;
+    final int bloodSpeedImpulse = 3;
     final double bloodSpeedDecrease = 0.01;
 
     GamePlay(int stateID) {
@@ -51,24 +51,22 @@ public class GamePlay extends BasicGameState {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
-        
         this.levelManager.render(gc, sbg, grphcs);
-        
-        this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
-
 
         for (StaticObject so : this.objects) {
             so.getRenderable().draw((float) so.coords.getX(),(float) so.coords.getY());
         }
+
+        this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
     }
 
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
-        
-        this.levelManager.update(this.bloodSpeed);
-        
         manageInput(gc, sbg, i);
+        
         updateObjects();
+
+        this.levelManager.update(this.bloodSpeed);
     }
 
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
@@ -90,15 +88,13 @@ public class GamePlay extends BasicGameState {
                 this.bloodSpeed = 0;
             }
         }
-        
-        System.out.println("plop " + bloodSpeed);
     }
 
     private void updateObjects() {
         List<StaticObject> toRemove = new ArrayList<StaticObject>();
 
         for (StaticObject so : this.objects) {
-            so.move(-this.bloodSpeed, 0);
+            so.move((int)-this.bloodSpeed, 0);
             if (so.coords.getX() < 50) {
                 toRemove.add(so);
             }
@@ -114,6 +110,5 @@ public class GamePlay extends BasicGameState {
 //            System.out.println(bloodSpeed + " -> alpha = " + alpha);
 //            levelManager.setBlackFxAlpha(alpha);
 //        }
-        
     }
 }

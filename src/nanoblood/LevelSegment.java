@@ -35,7 +35,7 @@ public class LevelSegment extends Sprite {
         }
     }
     
-    public void addToX(int dx) {
+    public void addToX(double dx) {
         this.coords.setLocation(coords.getX() + dx, coords.getY());
     }
 }

@@ -4,7 +4,9 @@
  */
 package nanoblood;
 
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.TreeMap;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Shape;
 
 /**
  *
@@ -43,8 +46,17 @@ public abstract class Sprite {
         return df.format(num);
     }
 
-    public abstract Renderable getRenderable();
+    public boolean colide(Sprite s) {
+        return this.boundingBox.intersects(s.boundingBox);
+    }
+
+    //--------------------------- END STATIC ---------------------------
+    
     protected Point2D coords = new Point2D.Double();
+
+    protected Shape boundingBox;
+
+    public abstract Renderable getRenderable();
 
     public Point2D getCoords() {
         return coords;
@@ -55,6 +67,16 @@ public abstract class Sprite {
     }
 
     public void setCoords(int x, int y) {
-        this.coords.setLocation(x, y);
+        boundingBox.setX(x + (boundingBox.getX() - (int)coords.getX()));
+        boundingBox.setY(y + (boundingBox.getY() - (int)coords.getY()));
+        coords.setLocation(x, y);
     }
+
+    public Shape getBoundingBox() {
+        return boundingBox;
+    }
+
+
+
+
 }

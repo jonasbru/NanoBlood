@@ -40,8 +40,8 @@ public class LevelManager {
         blackFxImage = Sprite.getImage("sprites/fx/BlackFx.png");
         blackFxImage.setAlpha(0.0f);
     }
-
-    public void update(int deltaPixels) throws SlickException {
+ 
+    public void update(double deltaPixels) throws SlickException {
 
         if (deltaPixels <= 0) {
             return;
