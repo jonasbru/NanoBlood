@@ -95,7 +95,7 @@ public class GamePlay extends BasicGameState {
 
         for (StaticObject so : this.objects) {
             so.move((int)-this.bloodSpeed, 0);
-            if (so.coords.getX() < 50) {
+            if (so.coords.getX() < -50) {
                 toRemove.add(so);
             }
         }
