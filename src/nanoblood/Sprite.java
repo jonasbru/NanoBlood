@@ -53,4 +53,8 @@ public abstract class Sprite {
     public void setCoords(Point2D coords) {
         this.coords = coords;
     }
+
+    public void setCoords(int x, int y) {
+        this.coords.setLocation(x, y);
+    }
 }
