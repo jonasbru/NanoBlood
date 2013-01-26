@@ -77,7 +77,7 @@ public class GamePlay extends BasicGameState {
         updateObjects();
 
         //TODO : lag, tofix
-//        this.levelManager.update(this.bloodSpeed);
+        this.levelManager.update(this.bloodSpeed);
 
         manageColisions();
     }
@@ -130,7 +130,6 @@ public class GamePlay extends BasicGameState {
     private void manageColisions() {
         
         for(StaticObject so : this.objects) {
-            System.out.println("bounding " + so.getCoords().getX() + ":" + so.boundingBox.getX() + " " + so.getCoords().getY() + ":" + so.boundingBox.getY());
             if(this.player.boundingBox.intersects(so.getBoundingBox())) {
                 so.colideWithPlayer();
             }
