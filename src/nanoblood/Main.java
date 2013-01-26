@@ -17,12 +17,12 @@ import java.lang.reflect.Field;
  */
 public class Main extends StateBasedGame{
 
-    static int height = 720;
-    static int width = 1280;
-    static boolean fullscreen = false;
-    static boolean showFPS = true;
-    static String title = "NanoBlood";
-    static int fpslimit = 60;
+    public static final int height = 720;
+    public static final int width = 1280;
+    public static final boolean fullscreen = false;
+    public static final boolean showFPS = true;
+    public static final String title = "NanoBlood";
+    public static final int fpslimit = 60;
     public static final int MAINMENU = 0;
     public static final int GAMEPLAY = 1;
     public static final int GAMEEND = 2;
@@ -52,6 +52,7 @@ public class Main extends StateBasedGame{
 
     @Override
     public void initStatesList(GameContainer gc) throws SlickException {
+        this.addState(new GamePlay(GAMEPLAY));
         this.addState(new MainMenu(MAINMENU));
     }
 
