@@ -10,7 +10,7 @@ import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
 
 /**
- *
+ * Both for level segments and background segments.
  * @author Anthony
  */
 public class LevelSegment extends Sprite {
@@ -18,11 +18,11 @@ public class LevelSegment extends Sprite {
     protected Image segmentImage;
     private boolean isHorizontallyFlipped = false;
     
-    public LevelSegment(int segmentId, boolean isFlipped) throws SlickException {
+    public LevelSegment(String imagePath, boolean isFlipped) throws SlickException {
         
         this.coords = new Point2D.Double(0, 0);
         this.isHorizontallyFlipped = isFlipped;
-        this.segmentImage = Sprite.getImage("sprites/map/MAP_" + segmentId + ".png");
+        this.segmentImage = Sprite.getImage(imagePath);
     }
 
     @Override

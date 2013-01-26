@@ -108,5 +108,12 @@ public class GamePlay extends BasicGameState {
             this.objects.remove(so);
         }
         
+        // WIP : FX
+//        if (bloodSpeed < 100) {
+//            float alpha = 1 * (100 - bloodSpeed) / (100);
+//            System.out.println(bloodSpeed + " -> alpha = " + alpha);
+//            levelManager.setBlackFxAlpha(alpha);
+//        }
+        
     }
 }
