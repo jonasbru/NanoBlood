@@ -50,9 +50,9 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 		soundOn = new MouseOverArea(gc, soundOnImg, (int)(0.8 * Main.width), (int) (0.8 * Main.height), this);
 		soundOff = new MouseOverArea(gc, soundOffImg, (int)(0.8 * Main.width), (int) (0.8 * Main.height), this);
 		soundCurrent = soundOn;//By default, sound is activated
-		play = new MouseOverArea(gc, Sprite.getImage("sprites/play.png"), (int)(0.3 * Main.width), (int)(0.3*Main.height), this);
+		play = new MouseOverArea(gc, Sprite.getImage("sprites/play.png"), 575, 180, this);
 		play.setMouseOverImage(Sprite.getImage("sprites/play_mouseover.png"));
-		tuto = new MouseOverArea(gc, Sprite.getImage("sprites/tuto.png"), (int)(0.3 * Main.width), (int)(0.5*Main.height), this);
+		tuto = new MouseOverArea(gc, Sprite.getImage("sprites/tuto.png"), 200, 110, this);
 		tuto.setMouseOverImage(Sprite.getImage("sprites/tuto_mouseover.png"));
     }
 
