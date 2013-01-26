@@ -6,6 +6,7 @@ package nanoblood;
 
 import java.util.ArrayList;
 import java.util.List;
+import nanoblood.ui.HeartBeatDisplay;
 import nanoblood.ui.LifeDisplay;
 import nanoblood.ui.ScoreDisplay;
 import nanoblood.util.IObservable;
@@ -27,12 +28,16 @@ public class GamePlay extends BasicGameState implements IObservable {
     Player player;
     LevelManager levelManager;
     List<StaticObject> objects;
+    
+    // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 3;
     final double bloodSpeedDecrease = 0.01;
     int totalDistance = 0;
     int nextDistancePopObstacle;
     int deltaDistancePopObstacle = 200;
+    
+    
     private int score;
     private float life;
     
@@ -41,6 +46,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
+    HeartBeatDisplay heartBeatDisplay;
     
     // Observable vars
     private boolean hasChanged;
@@ -64,17 +70,19 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
         
-        // TODO declarer parametres dans un fichier properties
+        // TODO declarer parametres dans un fichier properties : WIP non pushé
         score = 0;
         life = 100;
         
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
         this.lifeDisplay = new LifeDisplay();
+        this.heartBeatDisplay = new HeartBeatDisplay();
         
         // Add observers
         this.observers.add(scoreDisplay);
         this.observers.add(lifeDisplay);
+        this.observers.add(heartBeatDisplay);
         
         // Notify for 1st time
         this.setChanged();
@@ -105,6 +113,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
         this.lifeDisplay.render(gc, sbg, grphcs);
+        this.heartBeatDisplay.render(gc, sbg, grphcs);
     }
 
     @Override
@@ -145,10 +154,14 @@ public class GamePlay extends BasicGameState implements IObservable {
             this.bloodSpeed += this.bloodSpeedImpulse;
         } else {
             this.bloodSpeed -= this.bloodSpeedDecrease * this.bloodSpeed;
-            if (this.bloodSpeed < 0) {
+            if (this.bloodSpeed  - 1 < 0) {
                 this.bloodSpeed = 0;
             }
         }
+        
+        // Update HB display
+        this.setChanged();
+        notifyObserver(heartBeatDisplay);
         
         // DEBUG score
         if (input.isKeyPressed(Input.KEY_TAB)) {
@@ -227,6 +240,10 @@ public class GamePlay extends BasicGameState implements IObservable {
     
     public float getLife() {
         return life;
+    }
+    
+    public float getHeartBeat() {
+        return bloodSpeed;
     }
     
     // --- Observer methods
