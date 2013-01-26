@@ -25,7 +25,7 @@ public class Obstacle extends StaticObject {
 
     public Obstacle() throws SlickException {
 
-        this.boundingBox = new Circle((int) this.coords.getX(), (int) this.coords.getX(), 20); //TODO changer
+        this.boundingBox = new Circle((int) this.coords.getX() + 30, (int) this.coords.getX() + 30, 30); //TODO changer
         
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {

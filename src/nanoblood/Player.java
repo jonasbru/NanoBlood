@@ -18,15 +18,14 @@ public class Player extends Sprite {
 
     private enum Anim {
 
-        STATIC, UP, DOWN
+        STATIC, UP_GO, UP_BACK, DOWN_GO, DOWN_BACK
     }
     Anim currentAnim;
-
     Image staticShip;
-    Animation staticA;
-    Animation down;
-    Animation up;
-
+    Animation downGo;
+    Animation downBack;
+    Animation upGo;
+    Animation upBack;
     final int VERTICAL_SPEED = 8;
 
     public Player() throws SlickException {
@@ -34,40 +33,51 @@ public class Player extends Sprite {
 
         this.boundingBox = new Rectangle(43, 13, 42, 43);
 
-        Image anim[] = new Image[48];
+        Image anim[] = new Image[5];
         for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/player/staticA/mainperso1_" + Sprite.intToString(i, 5) + ".png");
+            anim[i] = Sprite.getImage("sprites/player/goYUp/mainperso_mouvementx-_" + Sprite.intToString(i, 5) + ".png");
         }
-        this.staticA = new Animation(anim, 50, true);
+        this.upGo = new Animation(anim, 50, true);
+        this.upGo.setLooping(false);
 
-        anim = new Image[20];
+        anim = new Image[5];
         for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/obstacles/coffee/coffe" + Sprite.intToString(i, 5) + ".png");
+            anim[i] = Sprite.getImage("sprites/player/backYUp/mainperso_mouvementx-_" + Sprite.intToString(i, 5) + ".png");
         }
-        this.down = new Animation(anim, 50, true);
+        this.upBack = new Animation(anim, 50, true);
+        this.upBack.setLooping(false);
 
-        anim = new Image[20];
+        anim = new Image[5];
         for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/obstacles/coffee/coffe" + Sprite.intToString(i, 5) + ".png");
+            anim[i] = Sprite.getImage("sprites/player/goYDown/mainperso_mouvementx+_" + Sprite.intToString(i, 5) + ".png");
         }
-        this.up = new Animation(anim, 50, true);
+        this.downGo = new Animation(anim, 50, true);
+        this.downGo.setLooping(false);
 
+        anim = new Image[5];
+        for (int i = 0; i < anim.length; i++) {
+            anim[i] = Sprite.getImage("sprites/player/backYDown/mainperso_mouvementx+_" + Sprite.intToString(i, 5) + ".png");
+        }
+        this.downBack = new Animation(anim, 50, true);
+        this.downBack.setLooping(false);
 
-        this.staticA.start();
         currentAnim = Anim.STATIC;
     }
 
     @Override
     public Renderable getRenderable() {
         switch (this.currentAnim) {
-            case STATIC:
-                return this.staticA;
+            case UP_GO:
+                return this.upGo;
 
-            case UP:
-                return this.up;
+            case UP_BACK:
+                return this.upBack;
 
-            case DOWN:
-                return this.down;
+            case DOWN_GO:
+                return this.downGo;
+
+            case DOWN_BACK:
+                return this.downBack;
         }
 
         return this.staticShip;
@@ -77,29 +87,49 @@ public class Player extends Sprite {
         this.coords.setLocation(this.coords.getX(), this.coords.getY() - VERTICAL_SPEED);
         this.boundingBox.setY(boundingBox.getY() - VERTICAL_SPEED);
 
-        this.up.start();
-        this.down.stop();
-        this.staticA.stop();
+        if (currentAnim != Anim.UP_GO && this.upGo.isStopped()) {
+            this.upBack.stop();
+            this.downGo.stop();
+            this.downBack.stop();
 
-        currentAnim = Anim.UP;
+            this.upGo.restart();
+
+            currentAnim = Anim.UP_GO;
+        }
     }
 
     public void goDown() {
         this.coords.setLocation(this.coords.getX(), this.coords.getY() + VERTICAL_SPEED);
         this.boundingBox.setY(boundingBox.getY() + VERTICAL_SPEED);
 
-        this.down.start();
-        this.up.stop();
-        this.staticA.stop();
+        if (currentAnim != Anim.DOWN_GO && this.downGo.isStopped()) {
+            this.upGo.stop();
+            this.upBack.stop();
+            this.downBack.stop();
 
-        currentAnim = Anim.DOWN;
+            this.downGo.restart();
+
+            currentAnim = Anim.DOWN_GO;
+        }
     }
 
     public void stop() {
-        this.staticA.start();
-        this.down.stop();
-        this.up.stop();
+        this.upGo.stop();
+        this.downGo.stop();
 
-        currentAnim = Anim.STATIC;
+        if (currentAnim == Anim.UP_GO) {
+            currentAnim = Anim.UP_BACK;
+            this.upBack.restart();
+        } else if (currentAnim == Anim.DOWN_GO) {
+            currentAnim = Anim.DOWN_BACK;
+            this.downBack.restart();
+        }
+
+
+//        this.staticA.start();
+//        this.down.stop();
+//        this.up.stop();
+//
+//        currentAnim = Anim.STATIC;
     }
 }
