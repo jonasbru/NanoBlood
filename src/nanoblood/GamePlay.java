@@ -65,7 +65,7 @@ public class GamePlay extends BasicGameState {
         }
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
-        this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
+        this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
     }
 
     @Override

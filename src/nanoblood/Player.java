@@ -36,7 +36,6 @@ public class Player extends Sprite {
     public Player() throws SlickException {
         this.staticShip = Sprite.getImage("sprites/player/static.png");
         this.canons = Sprite.getImage("sprites/player/canons.png");
-        this.canons.setCenterOfRotation(25, 28);
         this.canons.rotate(90);
 
         this.boundingBox = new Rectangle(43, 13, 42, 43);
