@@ -94,8 +94,8 @@ import org.newdawn.slick.geom.Rectangle;
     public Renderable getRenderable() {
 		//* Updating graphics
 		Vec2 pos = body.getPosition();
-		this.coords.setLocation(pos.x, pos.y);
-		this.boundingBox.setY(pos.y);
+		this.coords.setLocation(pos.x, GamePlay.yFromPhysicsToSlick(pos.y));
+		this.boundingBox.setY(GamePlay.yFromPhysicsToSlick(pos.y));
 		this.boundingBox.setX(pos.x);
 		//* Sending actual renderable
 		switch (this.currentAnim) {

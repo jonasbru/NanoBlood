@@ -60,6 +60,7 @@ public class GamePlay extends BasicGameState {
 	private int HEARTBEAT_THRESHOLD_CRAZY = 150;// dying soon
 	private int HEARTBEAT_THRESHOLD_MEDIUM = 90;// quite excited
 	private int HEARTBEAT_THRESHOLD_HARD = 120;// runner
+	private int heartBeatsSinceLastUpdate = 0;
 	
 
 	GamePlay(int stateID) {
@@ -102,16 +103,17 @@ public class GamePlay extends BasicGameState {
 	}
 
 	@Override
-	public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
+	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
 		removeObjects();
 		addObjects();
 
-		manageInput(gc, sbg, i);
+		manageInput(gc, sbg, delta);
 
+		updateCurrentHeartBeats(delta);
 		updatePhysics();
 		updateObjects();
 
-		this.levelManager.update(this.bloodSpeed);
+		this.levelManager.update(this.playerBody.getLinearVelocity().x);
 
 		manageColisions();
 	}
@@ -146,23 +148,19 @@ public class GamePlay extends BasicGameState {
 
 		if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
 //			this.bloodSpeed += this.bloodSpeedImpulse;
+			heartBeatsSinceLastUpdate++;
 			speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
 			playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
-		} else {
-			this.bloodSpeed -= this.bloodSpeedDecrease * this.bloodSpeed;
-			if (this.bloodSpeed < 0) {
-				this.bloodSpeed = 0;
-			}
-		}
+		} 
 
-		totalDistance += bloodSpeed;
+		totalDistance += bloodSpeed;//@TODO change that
 	}
 
 	private void updateObjects() {
 		List<StaticObject> toRemove = new ArrayList<StaticObject>();
 
 		for (StaticObject so : this.objects) {
-			so.move((int) -this.bloodSpeed / 3, 0);
+			so.move((int) (- 1.0f * this.playerBody.getLinearVelocity().x / 3.0f), 0);
 			if (so.coords.getX() < -50) {
 				toRemove.add(so);
 			}
@@ -209,7 +207,7 @@ public class GamePlay extends BasicGameState {
 	}
 
 	private void initPhysics() {
-		gravity = new Vec2(100.0f, 0);
+		gravity = new Vec2(0.0f, 0);
 		world = new World(gravity, true);
 //		gndBodydef = new BodyDef();
 //		gndBodydef.position.set(0.0f, (float) (0.2 * Main.width));
@@ -230,6 +228,7 @@ public class GamePlay extends BasicGameState {
 		//* The two next lines together allow us to have friction against a number of circles even if we are a circle ourself
 		playerFD.friction = 1.5f;
 		playerBody.setAngularDamping(200);
+		playerBody.setLinearDamping(1.2f);
 		playerBody.createFixture(playerFD);
 		timeStep = 1.0f / 60.0f;
 		velocityIterations = 6;
@@ -244,8 +243,27 @@ public class GamePlay extends BasicGameState {
 	public float ySlick2Physics(float y) {
 		return Main.height - y;
 	}
+	
+		
+	public static float yFromPhysicsToSlick(float y) {
+		return Main.height - y;
+	}
 
 	private void updatePhysics() {
 		world.step(timeStep, velocityIterations, positionIterations);
+	}
+
+	private int heartBeatAvgInterval = 2; // In seconds
+	private int heartBeatTimer = 0; // in "delta" units
+	private void updateCurrentHeartBeats(int delta) {
+		heartBeatTimer += delta;
+		if ((heartBeatAvgInterval* 1000) <= heartBeatTimer) { // 1000 delta values = 1 second
+			// Computing average:
+			currentHeartBeat = heartBeatsSinceLastUpdate / heartBeatAvgInterval;
+			// Resetting values:
+			heartBeatTimer -= heartBeatAvgInterval;
+			heartBeatsSinceLastUpdate = 0;
+		}
+		
 	}
 }
