@@ -53,7 +53,7 @@ public class LevelManager {
             LevelSegment headSegment = segmentsStack.peek();
             float headX = (float) (headSegment.getCoords().getX());
 
-            if (headX <= 0) {
+            if (headX <= 0 && segmentsStack.size() < 2) {
                 // Head segment is starting to go out of screen load another one
                 LevelSegment newSegment = selectNextSegment();
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * segmentsStack.size() + headX), 0));
@@ -69,14 +69,13 @@ public class LevelManager {
         for (LevelSegment segment : segmentsStack) {
             segment.addToX(-deltaPixels);
         }
-        
         // -----
         // Update Background stack
         if (!bgStack.isEmpty()) {
             LevelSegment headSegment = bgStack.peek();
             float headX = (float) (headSegment.getCoords().getX());
 
-            if (headX <= 0) {
+            if (headX <= 0 && bgStack.size() < 2) {
                 // Head segment is starting to go out of screen load another one
                 LevelSegment newSegment = new LevelSegment(BG_IMAGE, false);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * bgStack.size() + headX), 0));
