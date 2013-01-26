@@ -10,9 +10,17 @@ package nanoblood;
  * @author jonas
  */
 public abstract class StaticObject extends Sprite{
+    protected boolean remove = false;
+
     public void move(int x, int y) {
         this.getCoords().setLocation(getCoords().getX() + x, getCoords().getY() + y);
         this.boundingBox.setX(boundingBox.getX() + x);
         this.boundingBox.setY(boundingBox.getY() + y);
+    }
+
+    public abstract void colideWithPlayer();
+
+    public boolean needToRemove() {
+        return remove;
     }
 }

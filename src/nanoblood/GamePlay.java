@@ -54,7 +54,7 @@ public class GamePlay extends BasicGameState {
         this.levelManager.render(gc, sbg, grphcs);
 
         for (StaticObject so : this.objects) {
-            so.getRenderable().draw((float) so.coords.getX(),(float) so.coords.getY());
+            so.getRenderable().draw((float) so.coords.getX(), (float) so.coords.getY());
         }
 
         this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
@@ -62,8 +62,10 @@ public class GamePlay extends BasicGameState {
 
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
+        removeObjects();
+
         manageInput(gc, sbg, i);
-        
+
         updateObjects();
 
         this.levelManager.update(this.bloodSpeed);
@@ -84,7 +86,7 @@ public class GamePlay extends BasicGameState {
             this.bloodSpeed += this.bloodSpeedImpulse;
         } else {
             this.bloodSpeed -= this.bloodSpeedDecrease * this.bloodSpeed;
-            if(this.bloodSpeed < 0) {
+            if (this.bloodSpeed < 0) {
                 this.bloodSpeed = 0;
             }
         }
@@ -94,21 +96,40 @@ public class GamePlay extends BasicGameState {
         List<StaticObject> toRemove = new ArrayList<StaticObject>();
 
         for (StaticObject so : this.objects) {
-            so.move((int)-this.bloodSpeed, 0);
+            so.move((int) -this.bloodSpeed, 0);
             if (so.coords.getX() < -50) {
                 toRemove.add(so);
             }
         }
 
-        for(StaticObject so : toRemove) {
+        for (StaticObject so : toRemove) {
             this.objects.remove(so);
         }
-        
+
         // WIP : FX
 //        if (bloodSpeed < 100) {
 //            float alpha = 1 * (100 - bloodSpeed) / (100);
 //            System.out.println(bloodSpeed + " -> alpha = " + alpha);
 //            levelManager.setBlackFxAlpha(alpha);
 //        }
+    }
+    
+    private void manageColisions() {
+        for(StaticObject so : this.objects) {
+            if(this.player.boundingBox.intersects(so.getBoundingBox())) {
+
+            }
+        }
+    }
+
+    private void removeObjects() {
+        for(int i = 0; i < this.objects.size();) {
+            if(this.objects.get(i).needToRemove()) {
+                this.objects.remove(i);
+            } else {
+                i++;
+            }
+        }
+
     }
 }

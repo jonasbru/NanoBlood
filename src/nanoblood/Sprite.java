@@ -4,9 +4,7 @@
  */
 package nanoblood;
 
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;

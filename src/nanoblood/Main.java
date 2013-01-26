@@ -40,7 +40,7 @@ public class Main extends StateBasedGame{
         app.setDisplayMode(Main.width, Main.height, Main.fullscreen);
         app.setSmoothDeltas(true);
         app.setTargetFrameRate(Main.fpslimit);
-        app.setShowFPS(false);
+        app.setShowFPS(showFPS);
         app.start();
     }
 

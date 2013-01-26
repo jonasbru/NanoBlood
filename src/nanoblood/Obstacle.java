@@ -46,4 +46,11 @@ public class Obstacle extends StaticObject {
         return this.staticA;
     }
 
+    @Override
+    public void colideWithPlayer() {
+        this.remove = true;
+    }
+
+
+
 }

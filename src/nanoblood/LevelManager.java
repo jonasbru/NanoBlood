@@ -37,7 +37,7 @@ public class LevelManager {
         bgStack = new LinkedList<LevelSegment>();
         bgStack.add(new LevelSegment(BG_IMAGE, false));
         
-        blackFxImage = Sprite.getImage("sprites/fx/BlackFx.png");
+        blackFxImage = Sprite.getImage("sprites/fx/BlackFX.png");
         blackFxImage.setAlpha(0.0f);
     }
  
