@@ -1,0 +1,45 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package nanoblood;
+
+import org.newdawn.slick.Animation;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.Renderable;
+import org.newdawn.slick.SlickException;
+
+/**
+ *
+ * @author jonas
+ */
+public class Obstacle extends StaticObject {
+    private enum Anim {
+        STATIC
+    }
+    Anim currentAnim;
+    
+    Animation staticA;
+
+    public Obstacle() throws SlickException {
+        Image anim[] = new Image[20];
+        for (int i = 0; i < anim.length; i++) {
+            anim[i] = Sprite.getImage("sprites/obstacles/coffee/coffe" + Sprite.intToString(i, 5) + ".png");
+        }
+        this.staticA = new Animation(anim, 50, true);
+
+        this.currentAnim = Anim.STATIC;
+    }
+
+    @Override
+    public Renderable getRenderable() {
+        switch (this.currentAnim) {
+            case STATIC:
+                return this.staticA;
+        }
+
+        return this.staticA;
+    }
+
+}

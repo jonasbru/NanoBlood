@@ -4,6 +4,8 @@
  */
 package nanoblood;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -20,7 +22,10 @@ public class GamePlay extends BasicGameState {
     int stateID = -1;
     Player player;
     LevelManager levelManager;
-    int scrollSpeed = 0;
+    List<StaticObject> objects;
+    int bloodSpeed = 0;
+    final int bloodSpeedImpulse = 20;
+    final double bloodSpeedDecrease = 0.01;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -31,28 +36,39 @@ public class GamePlay extends BasicGameState {
         return stateID;
     }
 
+    @Override
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         this.player = new Player();
         this.levelManager = new LevelManager();
-        this.scrollSpeed = 0;
+        this.objects = new ArrayList<StaticObject>();
+
+        for (int i = 0; i < 200; i++) {
+            Obstacle o = new Obstacle();
+            o.setCoords(i * 200, (int) (Math.random() * Main.height));
+            this.objects.add(o);
+        }
     }
 
+    @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
         
         this.levelManager.render(gc, sbg, grphcs);
         
         this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
+
+
+        for (StaticObject so : this.objects) {
+            so.getRenderable().draw((float) so.coords.getX(),(float) so.coords.getY());
+        }
     }
 
+    @Override
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
         
-        if (scrollSpeed > 0) {
-            scrollSpeed--;
-        }
-        
-        this.levelManager.update(this.scrollSpeed);
+        this.levelManager.update(this.bloodSpeed);
         
         manageInput(gc, sbg, i);
+        updateObjects();
     }
 
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
@@ -60,14 +76,36 @@ public class GamePlay extends BasicGameState {
 
         if (input.isKeyDown(Input.KEY_UP)) {
             player.goUp();
-        }
-
-        if (input.isKeyDown(Input.KEY_DOWN)) {
+        } else if (input.isKeyDown(Input.KEY_DOWN)) {
             player.goDown();
+        } else {
+            player.stop();
         }
 
-        if (input.isKeyDown(Input.KEY_SPACE)) {
-            scrollSpeed += 3;
+        if (input.isKeyPressed(Input.KEY_SPACE)) {
+            this.bloodSpeed += this.bloodSpeedImpulse;
+        } else {
+            this.bloodSpeed -= this.bloodSpeedDecrease * this.bloodSpeed;
+            if(this.bloodSpeed < 0) {
+                this.bloodSpeed = 0;
+            }
+        }
+        
+        System.out.println("plop " + bloodSpeed);
+    }
+
+    private void updateObjects() {
+        List<StaticObject> toRemove = new ArrayList<StaticObject>();
+
+        for (StaticObject so : this.objects) {
+            so.move(-this.bloodSpeed, 0);
+            if (so.coords.getX() < 50) {
+                toRemove.add(so);
+            }
+        }
+
+        for(StaticObject so : toRemove) {
+            this.objects.remove(so);
         }
         
     }
