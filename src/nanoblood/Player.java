@@ -4,6 +4,7 @@
  */
 package nanoblood;
 
+import org.jbox2d.dynamics.Body;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
@@ -15,6 +16,7 @@ import org.newdawn.slick.geom.Rectangle;
  * @author jonas
  */
 public class Player extends Sprite {
+	private final Body body;
 
     private enum Anim {
 
@@ -41,7 +43,8 @@ public class Player extends Sprite {
 		return this.staticShip.getHeight();
 	}
 
-	public Player() throws SlickException {
+	public Player(Body body) throws SlickException {
+		this.body = body;
         this.staticShip = Sprite.getImage("sprites/player/static.png");
         this.canons = Sprite.getImage("sprites/player/canons.png");
         this.canons.rotate(90);

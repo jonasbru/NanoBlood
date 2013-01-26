@@ -33,6 +33,12 @@ public class GamePlay extends BasicGameState {
 	float bloodSpeed = 0;
 	final int bloodSpeedImpulse = 3;
 	final double bloodSpeedDecrease = 0.01;
+	static public final int INITIAL_HEARTBEATS = 10;
+	static public final int IMPULSE_COEFF_SLOW = 13;
+	static public final int IMPULSE_COEFF_MEDIUM = 16;
+	static public final int IMPULSE_COEFF_HARD = 20;
+	static public final int IMPULSE_COEFF_CRAZY = 30;
+	
 	private Vec2 gravity;
 	private BodyDef gndBodydef;
 	private Body gndBody;
@@ -48,6 +54,13 @@ public class GamePlay extends BasicGameState {
 	int totalDistance = 0;
 	int nextDistancePopObstacle;
 	int deltaDistancePopObstacle = 200;
+	private Vec2 speedImpulse;
+	private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm
+	//* Note : Those values are heartbeat rhythms...
+	private int HEARTBEAT_THRESHOLD_CRAZY = 150;// dying soon
+	private int HEARTBEAT_THRESHOLD_MEDIUM = 90;// quite excited
+	private int HEARTBEAT_THRESHOLD_HARD = 120;// runner
+	
 
 	GamePlay(int stateID) {
 		this.stateID = stateID;
@@ -60,7 +73,8 @@ public class GamePlay extends BasicGameState {
 
 	@Override
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
-		this.player = new Player();
+		initPhysics();
+		this.player = new Player(playerBody);
 		this.levelManager = new LevelManager();
 		this.objects = new ArrayList<StaticObject>();
 
@@ -73,8 +87,6 @@ public class GamePlay extends BasicGameState {
 			o.setCoords(i * 200, (int) (Math.random() * Main.height));
 			this.objects.add(o);
 		}
-
-		initPhysics();
 	}
 
 	@Override
@@ -103,6 +115,21 @@ public class GamePlay extends BasicGameState {
 
 		manageColisions();
 	}
+	
+	private float computeImpulseFromHeartBeat(int hb) {
+		float result = 0.0f;
+		int coeff;
+		if (currentHeartBeat > HEARTBEAT_THRESHOLD_CRAZY) {
+			coeff = IMPULSE_COEFF_CRAZY;
+		} else if (currentHeartBeat > HEARTBEAT_THRESHOLD_HARD) {
+			coeff = IMPULSE_COEFF_CRAZY;
+		} else if (currentHeartBeat > HEARTBEAT_THRESHOLD_MEDIUM) {
+			coeff = IMPULSE_COEFF_CRAZY;
+		} else {
+			coeff = IMPULSE_COEFF_SLOW;
+		} 
+		return result;
+	}
 
 	private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
 		Input input = gc.getInput();
@@ -115,8 +142,10 @@ public class GamePlay extends BasicGameState {
 			player.stop();
 		}
 
-		if (input.isKeyPressed(Input.KEY_SPACE)) {
-			this.bloodSpeed += this.bloodSpeedImpulse;
+		if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
+//			this.bloodSpeed += this.bloodSpeedImpulse;
+			speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
+			playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
 		} else {
 			this.bloodSpeed -= this.bloodSpeedDecrease * this.bloodSpeed;
 			if (this.bloodSpeed < 0) {
