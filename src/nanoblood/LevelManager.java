@@ -21,7 +21,7 @@ public class LevelManager {
     public static final int[] SEGMENT_IDS = { 1, 3 };
     // TODO public static final int SEGMENTS_COUNT = nb images segments;
     private static final double BG_PARALLAX_MODIFIER = 0.1;
-    private static final String BG_IMAGE = "sprites/map/BG_Test.png";
+    private static final String BG_IMAGE = "sprites/map/Background.jpg";
 
     private LinkedList<LevelSegment> segmentsStack;
     private LinkedList<LevelSegment> bgStack;
