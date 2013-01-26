@@ -179,11 +179,17 @@ public class GamePlay extends BasicGameState {
 		timeStep = 1.0f/60.0f;
 		velocityIterations = 6;
 		positionIterations = 2;
+		for (int i = 0; i < 50; i++) {
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(10.0f, 10.0f);
+			gndBody.createFixture(shape, 1.0f);
+		}
 	}
 
 	private void updatePhysics() {
 		world.step(timeStep, velocityIterations, positionIterations);
 		this.player.setY(playerBody.getPosition().y);
 		this.player.setX(playerBody.getPosition().x);
+		
 	}
 }
