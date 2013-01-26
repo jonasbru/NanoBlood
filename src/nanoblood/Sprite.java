@@ -43,7 +43,10 @@ public abstract class Sprite {
         return df.format(num);
     }
 
+    //--------------------------- END STATIC ---------------------------
+
     public abstract Renderable getRenderable();
+    
     protected Point2D coords = new Point2D.Double();
 
     public Point2D getCoords() {

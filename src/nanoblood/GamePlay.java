@@ -22,8 +22,8 @@ public class GamePlay extends BasicGameState {
     int stateID = -1;
     Player player;
     List<StaticObject> objects;
-    int bloodSpeed = 0;
-    final int bloodSpeedImpulse = 20;
+    double bloodSpeed = 0;
+    final int bloodSpeedImpulse = 5;
     final double bloodSpeedDecrease = 0.01;
 
     GamePlay(int stateID) {

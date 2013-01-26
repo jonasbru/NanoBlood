@@ -10,7 +10,7 @@ package nanoblood;
  * @author jonas
  */
 public abstract class StaticObject extends Sprite{
-    public void move(int x, int y) {
+    public void move(double x, double y) {
         this.getCoords().setLocation(getCoords().getX() + x, getCoords().getY() + y);
     }
 }
