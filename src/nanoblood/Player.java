@@ -5,6 +5,7 @@
 package nanoblood;
 
 import java.awt.Point;
+import java.util.Date;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.newdawn.slick.Animation;
@@ -37,6 +38,10 @@ public class Player extends Sprite {
     Animation downBack;
     Animation upGo;
     Animation upBack;
+    Animation shield;
+    boolean shieldActivated = false;
+    Date lastShieldActivation = null;
+    int shieldSeconds = 5;
     Image canons;
     final int VERTICAL_SPEED = 8;
 
@@ -83,6 +88,14 @@ public class Player extends Sprite {
         }
         this.downBack = new Animation(anim, 50, true);
         this.downBack.setLooping(false);
+
+        anim = new Image[20];
+        for (int i = 0; i < anim.length; i++) {
+            anim[i] = Sprite.getImage("sprites/obstacles/BOUCLIER/Shield" + Sprite.intToString(i, 5) + ".png");
+        }
+        this.shield = new Animation(anim, 50, true);
+        this.shield.start();
+
 
         currentAnim = Anim.STATIC;
     }
@@ -160,6 +173,26 @@ public class Player extends Sprite {
 //        this.up.stop();
 //
 //        currentAnim = Anim.STATIC;
+    }
+
+    public void activateShield(boolean active) {
+        this.shieldActivated = active;
+        if (active) {
+            lastShieldActivation = new Date();
+        }
+    }
+
+    public boolean isShieldActivated() {
+        if (shieldActivated) {
+            Date d = new Date();
+            float r = shieldSeconds * 1000 - (d.getTime() - lastShieldActivation.getTime());
+
+            if (r <= 0) {
+                shieldActivated = false;
+            }
+        }
+
+        return this.shieldActivated;
     }
 
     public Image getCanons() {

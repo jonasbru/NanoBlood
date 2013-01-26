@@ -15,6 +15,7 @@ import org.newdawn.slick.geom.Circle;
  * @author jonas
  */
 public class Virus extends Obstacle {
+
     private enum Anim {
 
         STATIC
@@ -28,7 +29,7 @@ public class Virus extends Obstacle {
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/obstacles/virus/virus" + Sprite.intToString(i, 5) + ".png");
+            anim[i] = Sprite.getImage("sprites/obstacles/VIRUS/vrius_" + Sprite.intToString(i, 5) + ".png");
         }
         this.staticA = new Animation(anim, 100, true);
 
@@ -49,9 +50,11 @@ public class Virus extends Obstacle {
     public void colideWithPlayer() {
         this.remove = true;
 
-        GamePlay.getGP().life -= 25;
+        if (!GamePlay.getGP().player.isShieldActivated()) {
+            GamePlay.getGP().life -= 25;
 
-        GamePlay.getGP().setChanged();
-        GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+            GamePlay.getGP().setChanged();
+            GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+        }
     }
 }

@@ -27,16 +27,14 @@ public class GlobuleRouge extends Obstacle {
 
         this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getX() + 50, 20);
 
-        int rand = (int) (Math.random() * 3);
+        int rand = (int) (Math.random() * 2);
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {
             if (rand < 1) {
-                anim[i] = Sprite.getImage("sprites/obstacles/rouge1/Glob-rouge_Anim1_" + Sprite.intToString(i, 5) + ".png");
+                anim[i] = Sprite.getImage("sprites/obstacles/GLOBUL_ROUGE/Glob-rouge1_" + Sprite.intToString(i, 5) + ".png");
             } else if (rand < 2) {
-                anim[i] = Sprite.getImage("sprites/obstacles/rouge2/Glob-rouge_Anim2_" + Sprite.intToString(i, 5) + ".png");
-            } else if (rand < 3) {
-                anim[i] = Sprite.getImage("sprites/obstacles/rouge3/Glob-rouge_Anim3_" + Sprite.intToString(i, 5) + ".png");
+                anim[i] = Sprite.getImage("sprites/obstacles/GLOBUL_ROUGE_2/Glob-rouge2_" + Sprite.intToString(i, 5) + ".png");
             }
         }
         this.staticA = new Animation(anim, 100, true);
@@ -57,10 +55,12 @@ public class GlobuleRouge extends Obstacle {
     @Override
     public void colideWithPlayer() {
         this.remove = true;
+        
+        if (!GamePlay.getGP().player.isShieldActivated()) {
+            GamePlay.getGP().life -= 10;
 
-        GamePlay.getGP().life -= 10;
-
-        GamePlay.getGP().setChanged();
-        GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+            GamePlay.getGP().setChanged();
+            GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+        }
     }
 }

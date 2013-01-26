@@ -161,7 +161,10 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
         this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
-
+        if(player.isShieldActivated()) {
+            player.shield.draw((float) this.player.getCoords().getX() - 25, (float) this.player.getCoords().getY() - 25);
+        }
+        
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
         this.lifeDisplay.render(gc, sbg, grphcs);

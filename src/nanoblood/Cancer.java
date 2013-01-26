@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package nanoblood;
 
 import org.newdawn.slick.Animation;
@@ -18,12 +17,11 @@ import org.newdawn.slick.geom.Circle;
 public class Cancer extends Obstacle {
 
     private enum Anim {
+
         STATIC
     }
     Anim currentAnim;
-
     Animation staticA;
-
     public static final int MOVEMENT_TO_PLAYER = 2;
 
     public Cancer() throws SlickException {
@@ -32,7 +30,7 @@ public class Cancer extends Obstacle {
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/obstacles/cancer/cancer" + Sprite.intToString(i, 5) + ".png");
+            anim[i] = Sprite.getImage("sprites/obstacles/CANCER/Shield_" + Sprite.intToString(i, 5) + ".png");
         }
         this.staticA = new Animation(anim, 100, true);
 
@@ -53,10 +51,12 @@ public class Cancer extends Obstacle {
     public void colideWithPlayer() {
         this.remove = true;
 
-        GamePlay.getGP().life -= 50;
+        if (!GamePlay.getGP().player.isShieldActivated()) {
 
-        GamePlay.getGP().setChanged();
-        GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+            GamePlay.getGP().life -= 50;
+
+            GamePlay.getGP().setChanged();
+            GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+        }
     }
-
 }
