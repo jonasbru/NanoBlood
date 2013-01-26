@@ -6,6 +6,10 @@ package nanoblood;
 
 import java.util.ArrayList;
 import java.util.List;
+import nanoblood.ui.LifeDisplay;
+import nanoblood.ui.ScoreDisplay;
+import nanoblood.util.IObservable;
+import nanoblood.util.IObserver;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -17,7 +21,7 @@ import org.newdawn.slick.state.StateBasedGame;
  *
  * @author jonas
  */
-public class GamePlay extends BasicGameState {
+public class GamePlay extends BasicGameState implements IObservable {
 
     int stateID = -1;
     Player player;
@@ -29,7 +33,19 @@ public class GamePlay extends BasicGameState {
     int totalDistance = 0;
     int nextDistancePopObstacle;
     int deltaDistancePopObstacle = 200;
+    private int score;
+    private float life;
+    
+    // TODO timer
 
+    // UI elements
+    ScoreDisplay scoreDisplay;
+    LifeDisplay lifeDisplay;
+    
+    // Observable vars
+    private boolean hasChanged;
+    private ArrayList<IObserver> observers;
+    
     GamePlay(int stateID) {
         this.stateID = stateID;
     }
@@ -44,6 +60,25 @@ public class GamePlay extends BasicGameState {
         this.player = new Player();
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<StaticObject>();
+        
+        this.hasChanged = false;
+        this.observers = new ArrayList<IObserver>();
+        
+        // TODO declarer parametres dans un fichier properties
+        score = 0;
+        life = 100;
+        
+        // Create UI elements
+        this.scoreDisplay = new ScoreDisplay();
+        this.lifeDisplay = new LifeDisplay();
+        
+        // Add observers
+        this.observers.add(scoreDisplay);
+        this.observers.add(lifeDisplay);
+        
+        // Notify for 1st time
+        this.setChanged();
+        this.notifyObservers();
 
         nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
 
@@ -65,6 +100,10 @@ public class GamePlay extends BasicGameState {
         }
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
+        
+        // UI : render last
+        this.scoreDisplay.render(gc, sbg, grphcs);
+        this.lifeDisplay.render(gc, sbg, grphcs);
     }
 
     @Override
@@ -76,10 +115,15 @@ public class GamePlay extends BasicGameState {
 
         updateObjects();
 
-        //TODO : lag, tofix
         this.levelManager.update(this.bloodSpeed);
 
         manageColisions();
+        
+        // TODO check for game over : life <= 0
+        
+        score = (int) bloodSpeed;
+        setChanged();
+        notifyObserver(scoreDisplay);
     }
 
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
@@ -100,6 +144,22 @@ public class GamePlay extends BasicGameState {
             if (this.bloodSpeed < 0) {
                 this.bloodSpeed = 0;
             }
+        }
+        
+        // DEBUG score
+        if (input.isKeyPressed(Input.KEY_TAB)) {
+            score += 100;
+            setChanged();
+            notifyObserver(scoreDisplay);
+        }
+        
+        // DEBUG life
+        if (input.isKeyPressed(Input.KEY_A)) {
+            if (life > 0) {
+                life -= 20;
+            }
+            setChanged();
+            notifyObserver(lifeDisplay);
         }
 
         totalDistance += bloodSpeed;
@@ -132,6 +192,8 @@ public class GamePlay extends BasicGameState {
         for(StaticObject so : this.objects) {
             if(this.player.boundingBox.intersects(so.getBoundingBox())) {
                 so.colideWithPlayer();
+                
+                // TODO update life value
             }
         }
     }
@@ -154,4 +216,67 @@ public class GamePlay extends BasicGameState {
             nextDistancePopObstacle += deltaDistancePopObstacle;
         }
     }
+    
+    public int getScore() {
+        return score;
+    }
+    
+    public float getLife() {
+        return life;
+    }
+    
+    // --- Observer methods
+
+    @Override
+    public void addObserver(IObserver o) {
+        observers.add(o);
+    }
+
+    @Override
+    public int countObservers() {
+        return observers.size();
+    }
+
+    @Override
+    public void deleteObserver(IObserver o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void deleteObservers(IObserver o) {
+        observers.clear();
+    }
+
+    @Override
+    public boolean hasChanged() {
+        return hasChanged;
+    }
+    
+    @Override
+    public void notifyObserver(IObserver o) {
+        if (hasChanged() && observers.indexOf(o) != -1) {
+            observers.get(observers.indexOf(o)).update(this, null);
+            clearChanged();
+        }
+    }
+    
+    @Override
+    public void notifyObservers() {
+        if (hasChanged()) {
+            for (IObserver obs : observers) {
+                obs.update(this, null);
+            }
+            clearChanged();
+        }
+    }
+    
+    protected void clearChanged() {
+        hasChanged = false;
+    }
+    
+    protected void setChanged() {
+        hasChanged = true;
+    }
+    
+    
 }
