@@ -33,7 +33,7 @@ public class MainMenu extends BasicGameState{
     }
 
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
-        test = new Image("sprites/Narwhals_breach.jpg");
+        test = new Image("sprites/main_menu.jpg");
     }
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
