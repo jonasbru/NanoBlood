@@ -5,43 +5,34 @@
 package nanoblood;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
 
 /**
  *
  * @author Anthony
  */
-public class LevelSegment {
+public class LevelSegment extends Sprite {
     
-    public static int LAYERS_COUNT = 1;//3;
+    protected Image segmentImage;
+    private boolean isHorizontallyFlipped = false;
     
-    protected Point2D coords;
-    protected ArrayList<Image> layers;
-    
-    public LevelSegment(int segmentId) throws SlickException {
-        coords = new Point2D.Float(0, 0);
-        layers = new ArrayList<Image>(LAYERS_COUNT);
+    public LevelSegment(int segmentId, boolean isFlipped) throws SlickException {
         
-        // BG
-        //layers.add(Sprite.getImage("sprites/map/bg" + segmentId + ".png"));
-        // Vein
-        layers.add(Sprite.getImage("sprites/map/MAP_" + segmentId + ".png"));
-        // Obstacles
-        //layers.add(Sprite.getImage("sprites/map/obstacle" + segmentId + ".png"));
-    }
-    
-    public ArrayList<Image> getLayers() {
-        return layers;
+        this.coords = new Point2D.Double(0, 0);
+        this.isHorizontallyFlipped = isFlipped;
+        this.segmentImage = Sprite.getImage("sprites/map/MAP_" + segmentId + ".png");
     }
 
-    public Point2D getCoords() {
-        return coords;
-    }
-
-    public void setCoords(Point2D coords) {
-        this.coords = coords;
+    @Override
+    public Renderable getRenderable() {
+        if (this.isHorizontallyFlipped) {
+            return this.segmentImage.getFlippedCopy(true, false);
+        }
+        else {
+            return segmentImage;
+        }
     }
     
     public void addToX(int dx) {
