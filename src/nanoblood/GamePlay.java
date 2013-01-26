@@ -55,25 +55,7 @@ public class GamePlay extends BasicGameState {
             this.objects.add(o);
         }
 		
-		Vec2 gravity = new Vec2(10.0f, 0);
-		World world = new World(gravity, true);
-		BodyDef gndBodydef = new BodyDef();
-		gndBodydef.position.set(0.0f, (float)(0.2 * Main.width));
-		Body gndBody = world.createBody(gndBodydef);
-		PolygonShape gndBox = new PolygonShape();
-		gndBox.setAsBox(10.0f, (float)Main.width);
-		gndBody.createFixture(gndBox, 0.0f);
-		BodyDef playerBodyDef = new BodyDef();
-		playerBodyDef.type = BodyType.DYNAMIC;
-		playerBodyDef.position.x = (float)Main.width / 2;
-		playerBodyDef.position.y = (float)this.player.getCoords().getY();
-		Body playerBody = world.createBody(playerBodyDef);
-		PolygonShape playerShape = new PolygonShape();
-		playerShape.setAsBox(this.player.getWidth()/2, this.player.getHeight()/2);
-		FixtureDef playerFD = new FixtureDef();
-		playerFD.shape = playerShape;
-		playerFD.density = 1.0f;
-		playerFD.friction =  0.3f;
+		initPhysics();
     }
 
     @Override
@@ -159,4 +141,26 @@ public class GamePlay extends BasicGameState {
         }
 
     }
+
+	private void initPhysics() {
+		Vec2 gravity = new Vec2(10.0f, 0);
+		World world = new World(gravity, true);
+		BodyDef gndBodydef = new BodyDef();
+		gndBodydef.position.set(0.0f, (float)(0.2 * Main.width));
+		Body gndBody = world.createBody(gndBodydef);
+		PolygonShape gndBox = new PolygonShape();
+		gndBox.setAsBox(10.0f, (float)Main.width);
+		gndBody.createFixture(gndBox, 0.0f);
+		BodyDef playerBodyDef = new BodyDef();
+		playerBodyDef.type = BodyType.DYNAMIC;
+		playerBodyDef.position.x = (float)Main.width / 2;
+		playerBodyDef.position.y = (float)this.player.getCoords().getY();
+		Body playerBody = world.createBody(playerBodyDef);
+		PolygonShape playerShape = new PolygonShape();
+		playerShape.setAsBox(this.player.getWidth()/2, this.player.getHeight()/2);
+		FixtureDef playerFD = new FixtureDef();
+		playerFD.shape = playerShape;
+		playerFD.density = 1.0f;
+		playerFD.friction =  0.3f;
+	}
 }
