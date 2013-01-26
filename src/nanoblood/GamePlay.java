@@ -4,8 +4,13 @@
  */
 package nanoblood;
 
+import java.security.Timestamp;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -27,6 +32,11 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class GamePlay extends BasicGameState {
 
+	class Pair<T1, T2> {
+		public T1 first;
+		public T2 second;
+	}
+	
 	int stateID = -1;
 	Player player;
 	LevelManager levelManager;
@@ -58,7 +68,7 @@ public class GamePlay extends BasicGameState {
 	private Vec2 speedImpulse;
 	private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
 	//* Note : Those values are heartbeat rhythms...
-	static public final int INITIAL_HEARTBEATS = 70;// per minutes
+	static public final int INITIAL_HEARTBEATS = 50;// per minutes
 	private int HEARTBEAT_THRESHOLD_CRAZY = 150;// dying soon
 	private int HEARTBEAT_THRESHOLD_MEDIUM = 90;// quite excited
 	private int HEARTBEAT_THRESHOLD_HARD = 120;// runner
@@ -66,6 +76,7 @@ public class GamePlay extends BasicGameState {
 	protected static final float PIXELS_TO_METERS_RATIO = 10.0f;
 	static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
 	private static boolean DBG = true;
+	private LinkedList<Long> HBList = new LinkedList<Long>();
 	
 
 	GamePlay(int stateID) {
@@ -94,6 +105,16 @@ public class GamePlay extends BasicGameState {
 			this.objects.add(o);
 		}
 	}
+	
+	@Override
+	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
+		System.out.println("ENTERING !");
+		//* Pushing data to the HBQueue at the beginning so that the average on the last 10 seconds is not null or very low but is 70 HB
+		java.util.Date date= new java.util.Date();
+		for (int i = 0; i < ((double)INITIAL_HEARTBEATS/60.0)*heartBeatAvgInterval+1; i++) {
+			HBList.add(date.getTime());// Note: The time is not necessarily different for each HB
+		}
+	}
 
 	@Override
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
@@ -116,7 +137,7 @@ System.out.println(this.player.getCoords());
 
 		manageInput(gc, sbg, delta);
 
-		updateCurrentHeartBeats(delta);
+		updateCurrentHB(delta);
 		updatePhysics();
 		updateObjects();
 
@@ -154,10 +175,7 @@ System.out.println(this.player.getCoords());
 		}
 
 		if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
-//			this.bloodSpeed += this.bloodSpeedImpulse;
-			heartBeatsSinceLastUpdate++;
-			speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
-			playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
+			playerHeartBeat(delta);
 		} 
 
 		totalDistance += bloodSpeed;//@TODO change that
@@ -189,13 +207,6 @@ System.out.println(this.player.getCoords());
 		for (StaticObject so : toRemove) {
 			this.objects.remove(so);
 		}
-
-		// WIP : FX
-//        if (bloodSpeed < 100) {
-//            float alpha = 1 * (100 - bloodSpeed) / (100);
-//            System.out.println(bloodSpeed + " -> alpha = " + alpha);
-//            levelManager.setBlackFxAlpha(alpha);
-//        }
 	}
 
 	private void manageColisions() {
@@ -253,11 +264,6 @@ System.out.println(this.player.getCoords());
 		timeStep = 1.0f / 60.0f;
 		velocityIterations = 6;
 		positionIterations = 2;
-//		for (int i = 0; i < 50; i++) {
-//			PolygonShape shape = new PolygonShape();
-//			shape.setAsBox(10.0f, 10.0f);
-//			gndBody.createFixture(shape, 1.0f);
-//		}
 	}
 	
 	public float ySlick2Physics(float y) {
@@ -291,20 +297,34 @@ System.out.println(this.player.getCoords());
 		return (int) (m * PIXELS_TO_METERS_RATIO);
 	}
 
-	private double heartBeatAvgInterval = 10.0; // In seconds
-	private int heartBeatTimer = 0; // in "delta" units
-	private void updateCurrentHeartBeats(int delta) {
-		heartBeatTimer += delta;
-		if ((heartBeatAvgInterval* 1000) <= heartBeatTimer) { // 1000 delta values = 1 second
-			// Computing average:
-			currentHeartBeat = (int) (heartBeatsSinceLastUpdate / heartBeatAvgInterval * 60.0);//Average on {heartBeatAvgInterval} seconds, that we put on a 60seconds basis
-			// Resetting values:
-			heartBeatTimer -= heartBeatAvgInterval*1000;
-			heartBeatsSinceLastUpdate = 0;
-			if (DBG) {
-				System.out.println("currentHeartBeat=" + currentHeartBeat);
+	private int heartBeatAvgInterval = 10; // In seconds
+	private void updateCurrentHB(int delta) {
+		// Computing average:
+		Long tenSecondsAgo = new Date().getTime() - heartBeatAvgInterval * 1000;
+		int sum = 0; // sum of the HB in the last 10 seconds
+		for (int i = 0; i < HBList.size();) {// until the end of the list (/!\ the list is changed inside the loop)
+			Long l = HBList.get(i);
+			if (l.compareTo(tenSecondsAgo) < 0) {// if too old
+				HBList.remove(i);// remove and DO NOT increment i
+			} else { // else, take into account and go to next (increment i)
+				i++;
+				sum++;
 			}
 		}
-		
+		currentHeartBeat = (int) ((double)sum / (double) (heartBeatAvgInterval) * 60.0);//Average on {heartBeatAvgInterval} seconds, that we put on a 60seconds basis
+		if (DBG) {
+			System.out.println("currentHeartBeat=" + currentHeartBeat);
+		}
+	}
+	
+	/**
+	 * This method is executed in manageInput() everytime a heartbeat input from the player is received
+	 * @param delta 
+	 */
+	private void playerHeartBeat(int delta) {
+		speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
+		playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
+		java.util.Date date= new java.util.Date();
+		HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
 	}
 }
