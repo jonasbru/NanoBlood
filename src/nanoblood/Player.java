@@ -8,6 +8,7 @@ import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Rectangle;
 
 /**
  *
@@ -26,8 +27,12 @@ public class Player extends Sprite {
     Animation down;
     Animation up;
 
+    final int VERTICAL_SPEED = 8;
+
     public Player() throws SlickException {
         this.staticShip = Sprite.getImage("sprites/player/static.png");
+
+        this.boundingBox = new Rectangle(43, 13, 42, 43);
 
         Image anim[] = new Image[48];
         for (int i = 0; i < anim.length; i++) {
@@ -69,7 +74,9 @@ public class Player extends Sprite {
     }
 
     public void goUp() {
-        this.coords.setLocation(this.coords.getX(), this.coords.getY() - 5);
+        this.coords.setLocation(this.coords.getX(), this.coords.getY() - VERTICAL_SPEED);
+        this.boundingBox.setY(boundingBox.getY() - VERTICAL_SPEED);
+
         this.up.start();
         this.down.stop();
         this.staticA.stop();
@@ -78,7 +85,9 @@ public class Player extends Sprite {
     }
 
     public void goDown() {
-        this.coords.setLocation(this.coords.getX(), this.coords.getY() + 5);
+        this.coords.setLocation(this.coords.getX(), this.coords.getY() + VERTICAL_SPEED);
+        this.boundingBox.setY(boundingBox.getY() + VERTICAL_SPEED);
+
         this.down.start();
         this.up.stop();
         this.staticA.stop();

@@ -23,8 +23,8 @@ public class GamePlay extends BasicGameState {
     Player player;
     LevelManager levelManager;
     List<StaticObject> objects;
-    double bloodSpeed = 0;
-    final int bloodSpeedImpulse = 5;
+    float bloodSpeed = 0;
+    final int bloodSpeedImpulse = 3;
     final double bloodSpeedDecrease = 0.01;
 
     GamePlay(int stateID) {
@@ -94,7 +94,7 @@ public class GamePlay extends BasicGameState {
         List<StaticObject> toRemove = new ArrayList<StaticObject>();
 
         for (StaticObject so : this.objects) {
-            so.move(-this.bloodSpeed, 0);
+            so.move((int)-this.bloodSpeed, 0);
             if (so.coords.getX() < 50) {
                 toRemove.add(so);
             }
