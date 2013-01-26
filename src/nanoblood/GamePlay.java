@@ -33,7 +33,7 @@ public class GamePlay extends BasicGameState {
 	float bloodSpeed = 0;
 	final int bloodSpeedImpulse = 3;
 	final double bloodSpeedDecrease = 0.01;
-	static public final int INITIAL_HEARTBEATS = 10;
+	
 	static public final int IMPULSE_COEFF_SLOW = 13;
 	static public final int IMPULSE_COEFF_MEDIUM = 16;
 	static public final int IMPULSE_COEFF_HARD = 20;
@@ -57,6 +57,7 @@ public class GamePlay extends BasicGameState {
 	private Vec2 speedImpulse;
 	private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
 	//* Note : Those values are heartbeat rhythms...
+	static public final int INITIAL_HEARTBEATS = 70;// per minutes
 	private int HEARTBEAT_THRESHOLD_CRAZY = 150;// dying soon
 	private int HEARTBEAT_THRESHOLD_MEDIUM = 90;// quite excited
 	private int HEARTBEAT_THRESHOLD_HARD = 120;// runner
@@ -253,13 +254,13 @@ public class GamePlay extends BasicGameState {
 		world.step(timeStep, velocityIterations, positionIterations);
 	}
 
-	private int heartBeatAvgInterval = 2; // In seconds
+	private double heartBeatAvgInterval = 2.0; // In seconds
 	private int heartBeatTimer = 0; // in "delta" units
 	private void updateCurrentHeartBeats(int delta) {
 		heartBeatTimer += delta;
 		if ((heartBeatAvgInterval* 1000) <= heartBeatTimer) { // 1000 delta values = 1 second
 			// Computing average:
-			currentHeartBeat = heartBeatsSinceLastUpdate / heartBeatAvgInterval;
+			currentHeartBeat = (int) (heartBeatsSinceLastUpdate / heartBeatAvgInterval * 60.0);//Average on {heartBeatAvgInterval} seconds, that we put on a 60seconds basis
 			// Resetting values:
 			heartBeatTimer -= heartBeatAvgInterval;
 			heartBeatsSinceLastUpdate = 0;
