@@ -13,12 +13,13 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 /**
+ * Level scrolling manager.
  * 
  * @author Anthony
  */
 public class LevelManager {
     
-    public static final int[] SEGMENT_IDS = { 1, 2, 3, 4, 5};
+    public static final int[] SEGMENT_IDS = { 1, 2, 3, 4, 5, 6, 7};
     public static final int SEGMENT_X_OFFSET = 48; //px 
     // TODO public static final int SEGMENTS_COUNT = nb images segments;
     
@@ -99,8 +100,6 @@ public class LevelManager {
         for (LevelSegment bg : bgStack) {
             bg.addToX((int) (-deltaPixels * BG_PARALLAX_MODIFIER));
         }
-        
-        System.out.println("delta:" + deltaPixels);
     }
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics gr) {
