@@ -34,16 +34,24 @@ public enum GameParams {
         return Integer.parseInt(prop.getProperty("ScorePerSecond"));
     }
     
-    public float ScoreModifierLow() {
-        return Float.parseFloat(prop.getProperty("ScoreModifierLow"));
+    public float ScoreModifier1() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier1"));
     }
     
-    public float ScoreModifierNormal() {
-        return Float.parseFloat(prop.getProperty("ScoreModifierNormal"));
+    public float ScoreModifier2() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier2"));
     }
     
-    public float ScoreModifierHigh() {
-        return Float.parseFloat(prop.getProperty("ScoreModifierHigh"));
+    public float ScoreModifier3() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier3"));
+    }
+    
+    public float ScoreModifier4() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier4"));
+    }
+    
+    public float ScoreModifier5() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier5"));
     }
     
     // Heart beat
@@ -59,17 +67,33 @@ public enum GameParams {
         return Float.parseFloat(prop.getProperty("MaxBeat"));
     }
     
-    public float LowBeatThreshold() {
-        return Float.parseFloat(prop.getProperty("LowBeatThreshold"));
+    public float BeatThreshold1() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold1"));
     }
     
-    public float HighBeatThreshold() {
-        return Float.parseFloat(prop.getProperty("HighBeatThreshold"));
+    public float BeatThreshold2() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold2"));
+    }
+    
+    public float BeatThreshold3() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold3"));
+    }
+    
+    public float BeatThreshold4() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold4"));
     }
     
     // Life
     public int MaxLife() {
         return Integer.parseInt(prop.getProperty("MaxLife"));
+    }
+    
+    public int DamageLowBeat() {
+        return Integer.parseInt(prop.getProperty("DamageLowBeat"));
+    }
+    
+    public int DamageHighBeat() {
+        return Integer.parseInt(prop.getProperty("DamageHighBeat"));
     }
     
     // TODO damages

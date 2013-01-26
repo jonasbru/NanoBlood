@@ -81,7 +81,7 @@ public class HeartBeatDisplay implements IObserver {
         if (heartBeat >= 0 && heartBeat < GameParams.INSTANCE.MaxBeat()) {
             int hbCursorPos = (int) (heartBeat * CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
 
-            gr.setColor(Color.green);
+            gr.setColor(new Color(0, 255, 100));
             gr.drawLine(X_OFFSET + CONTENT_X_OFFSET + hbCursorPos,
                     Main.height - 40 - Y_OFFSET + CONTENT_Y_OFFSET,
                     X_OFFSET + CONTENT_X_OFFSET + hbCursorPos,
@@ -89,8 +89,6 @@ public class HeartBeatDisplay implements IObserver {
         }
         
         String scoreText = "x " + scoreModifier;
-        int textWidth = unicodeFont.getWidth(scoreText);
-        
         gr.setColor(Color.white);
         gr.setFont(unicodeFont);
         gr.drawString(scoreText, 

@@ -199,8 +199,14 @@ public class GamePlay extends BasicGameState implements IObservable {
             float scoreModifier = getScoreModifier();
             System.out.println("HB: " +currentHeartBeat + ", Modifier: " + scoreModifier);
             addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
+            
+            if (currentHeartBeat < GameParams.INSTANCE.BeatThreshold1()) {
+                addLife(- GameParams.INSTANCE.DamageLowBeat());
+            }
+            else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold4()) {
+                addLife(- GameParams.INSTANCE.DamageHighBeat());
+            }
         }
-        
         
         // TODO game over screen
         if (life <= 0) {
@@ -397,7 +403,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
         currentHeartBeat = (int) ((double) sum / (double) (heartBeatAvgInterval) * 60.0);//Average on {heartBeatAvgInterval} seconds, that we put on a 60seconds basis
         if (DBG) {
-            //System.out.println("currentHeartBeat=" + currentHeartBeat);
+            System.out.println("currentHeartBeat=" + currentHeartBeat);
         }
     }
 
@@ -425,17 +431,23 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
     
     public float getScoreModifier() {
-        if (currentHeartBeat <= 0) {
-            return 0;
+        if (currentHeartBeat <= GameParams.INSTANCE.BeatThreshold1()) {
+            return GameParams.INSTANCE.ScoreModifier1();
         }
-        else if (currentHeartBeat > 0 && currentHeartBeat <= GameParams.INSTANCE.LowBeatThreshold()) {
-            return GameParams.INSTANCE.ScoreModifierLow();
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold1()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold2()) {
+            return GameParams.INSTANCE.ScoreModifier2();
         }
-        else if (currentHeartBeat >= GameParams.INSTANCE.HighBeatThreshold()) {
-            return GameParams.INSTANCE.ScoreModifierHigh();
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold2()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold3()) {
+            return GameParams.INSTANCE.ScoreModifier3();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold3()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold4()) {
+            return GameParams.INSTANCE.ScoreModifier4();
         }
         else {
-            return GameParams.INSTANCE.ScoreModifierNormal();
+            return GameParams.INSTANCE.ScoreModifier5();
         }
     }
     
@@ -449,7 +461,6 @@ public class GamePlay extends BasicGameState implements IObservable {
         score += dScore;
         setChanged();
         notifyObserver(scoreDisplay);
-        System.out.println("+Score: " + score);
     }
     
     // --- Observer methods
