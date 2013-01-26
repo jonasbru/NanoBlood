@@ -5,12 +5,14 @@
 package nanoblood.ui;
 
 import nanoblood.GamePlay;
-import nanoblood.Main;
+import nanoblood.Sprite;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 /**
@@ -22,15 +24,20 @@ public class LifeDisplay implements IObserver{
     private final static int X_OFFSET = 20;
     private final static int Y_OFFSET = 20;
     
-    public static final int BAR_WIDTH = 300;
-    public static final int BAR_HEIGHT = 30;
+    public static final int CONTENT_WIDTH = 290;
+    public static final int CONTENT_HEIGHT = 34;
+    public static final int CONTENT_X_OFFSET = 96;
+    public static final int CONTENT_Y_OFFSET = 11;
+    
     public static final int LIFE_MIN = 0; // get values from properties (or Gameplay)
     public static final int LIFE_MAX = 100;
     
     private float life;
+    private Image lifeBarBackground;
     
-    public LifeDisplay() {
+    public LifeDisplay() throws SlickException {
         this.life = 0f;
+        lifeBarBackground = Sprite.getImage("sprites/ui/LifeBar.png");
     }
 
     @Override
@@ -42,16 +49,19 @@ public class LifeDisplay implements IObserver{
     
     public void render(GameContainer gc, StateBasedGame sbg, Graphics gr) {
         
-        gr.setColor(Color.black);
-        gr.fillRect(X_OFFSET, Y_OFFSET, BAR_WIDTH, BAR_HEIGHT);
+        // bar BG
+        lifeBarBackground.draw(X_OFFSET, Y_OFFSET);
         
-        if (life > 0) {
-            int width = (int) (life * BAR_WIDTH / LIFE_MAX);
+        // black rect mask
+        if (life >= 0 && life < LIFE_MAX) {
+            int width = (int) ((LIFE_MAX - life) * CONTENT_WIDTH / LIFE_MAX);
             
-            gr.setColor(Color.green);
-            gr.fillRect(X_OFFSET, Y_OFFSET, width, BAR_HEIGHT);
+            gr.setColor(Color.black);
+            gr.fillRect(X_OFFSET + CONTENT_X_OFFSET + CONTENT_WIDTH - width, 
+                    Y_OFFSET + CONTENT_Y_OFFSET, 
+                    width, 
+                    CONTENT_HEIGHT);
         }
-        
     }
     
 }

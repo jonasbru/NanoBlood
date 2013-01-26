@@ -120,8 +120,11 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         manageColisions();
         
-        // TODO check for game over : life <= 0
+        if (life <= 0) {
+            // TODO game over screen
+        }
         
+        // DEBUG score
         score = (int) bloodSpeed;
         setChanged();
         notifyObserver(scoreDisplay);
@@ -157,7 +160,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         // DEBUG life
         if (input.isKeyPressed(Input.KEY_A)) {
             if (life > 0) {
-                life -= 20;
+                life -= 10;
             }
             setChanged();
             notifyObserver(lifeDisplay);
