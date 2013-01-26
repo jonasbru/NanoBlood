@@ -4,6 +4,8 @@
  */
 package nanoblood;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -19,6 +21,7 @@ public class GamePlay extends BasicGameState {
 
     int stateID = -1;
     Player player;
+    List<Object> objects;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -31,6 +34,7 @@ public class GamePlay extends BasicGameState {
 
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         this.player = new Player();
+        this.objects = new ArrayList<Object>();
     }
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
@@ -46,10 +50,10 @@ public class GamePlay extends BasicGameState {
 
         if (input.isKeyDown(Input.KEY_UP)) {
             player.goUp();
-        }
-
-        if (input.isKeyDown(Input.KEY_DOWN)) {
+        } else if (input.isKeyDown(Input.KEY_DOWN)) {
             player.goDown();
+        } else {
+            player.stop();
         }
     }
 }
