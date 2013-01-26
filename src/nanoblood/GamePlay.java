@@ -107,7 +107,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     @Override
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         initPhysics();
-        this.player = new Player(playerBody);
+        this.player = new PhysicsObject(new Player(), playerBody);
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<StaticObject>();
         
@@ -216,8 +216,10 @@ public class GamePlay extends BasicGameState implements IObservable {
         Input input = gc.getInput();
 
         if (input.isKeyDown(Input.KEY_UP)) {
+            player.move(Player.upImpulseVec);
             player.goUp();
         } else if (input.isKeyDown(Input.KEY_DOWN)) {
+            player.move(Player.upImpulseVec);
             player.goDown();
         } else {
             player.stop();
