@@ -26,6 +26,9 @@ public class GamePlay extends BasicGameState {
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 3;
     final double bloodSpeedDecrease = 0.01;
+    int totalDistance = 0;
+    int nextDistancePopObstacle;
+    int deltaDistancePopObstacle = 200;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -42,7 +45,11 @@ public class GamePlay extends BasicGameState {
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<StaticObject>();
 
-        for (int i = 0; i < 200; i++) {
+        nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
+
+        player.setCoords(200, Main.height / 2);
+
+        for (int i = 0; i < 6; i++) {
             Obstacle o = new Obstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
             this.objects.add(o);
@@ -57,18 +64,22 @@ public class GamePlay extends BasicGameState {
             so.getRenderable().draw((float) so.coords.getX(), (float) so.coords.getY());
         }
 
-        this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
+        this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
     }
 
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
         removeObjects();
+        addObjects();
 
         manageInput(gc, sbg, i);
 
         updateObjects();
 
-        this.levelManager.update(this.bloodSpeed);
+        //TODO : lag, tofix
+//        this.levelManager.update(this.bloodSpeed);
+
+        manageColisions();
     }
 
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
@@ -90,6 +101,8 @@ public class GamePlay extends BasicGameState {
                 this.bloodSpeed = 0;
             }
         }
+
+        totalDistance += bloodSpeed;
     }
 
     private void updateObjects() {
@@ -115,9 +128,11 @@ public class GamePlay extends BasicGameState {
     }
     
     private void manageColisions() {
+        
         for(StaticObject so : this.objects) {
+            System.out.println("bounding " + so.getCoords().getX() + ":" + so.boundingBox.getX() + " " + so.getCoords().getY() + ":" + so.boundingBox.getY());
             if(this.player.boundingBox.intersects(so.getBoundingBox())) {
-
+                so.colideWithPlayer();
             }
         }
     }
@@ -130,6 +145,14 @@ public class GamePlay extends BasicGameState {
                 i++;
             }
         }
+    }
 
+    private void addObjects() throws SlickException {
+        if(totalDistance > nextDistancePopObstacle) {
+            Obstacle o = new Obstacle();
+            o.setCoords(Main.width + 300 - (totalDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
+            this.objects.add(o);
+            nextDistancePopObstacle += deltaDistancePopObstacle;
+        }
     }
 }
