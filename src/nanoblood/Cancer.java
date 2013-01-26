@@ -24,7 +24,7 @@ public class Cancer extends Obstacle {
 
     Animation staticA;
 
-    public static final int MOVEMENT_TO_PLAYER = 2;
+    public static final int MOVEMENT_TO_PLAYER = 20;
 
     public Cancer() throws SlickException {
 

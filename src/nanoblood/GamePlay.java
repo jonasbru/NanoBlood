@@ -4,6 +4,7 @@
  */
 package nanoblood;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -65,6 +66,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int positionIterations;
     private World world;
     int totalDistance = 0;
+    float scrolledDistance = 0.0f;
     int nextDistancePopObstacle;
     int deltaDistancePopObstacle = 200;// distance between every obstacle spawn
 
@@ -216,7 +218,7 @@ public class GamePlay extends BasicGameState implements IObservable {
             player.move(Player.upImpulseVec);
             ((Player)player.getSprite()).goUp();
         } else if (input.isKeyDown(Input.KEY_DOWN)) {
-            player.moveImpulse(Player.upImpulseVec);
+            player.moveImpulse(Player.downImpulseVec);
             ((Player)player.getSprite()).goDown();
         } else {
             ((Player)player.getSprite()).stop();
@@ -341,7 +343,15 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     private void updatePhysics() {
+        Vec2 currPos = player.getCoordsVec();
         world.step(timeStep, velocityIterations, positionIterations);
+        scrolledDistance += player.getCoordsVec().sub(currPos).x;
+        PhysicsObject.setScrolledDistance(scrolledDistance);
+        if (DBG) {
+            for (PhysicsObject po : objects) {
+                System.out.println(po.getCoords());
+            }
+        }
     }
 
     /**
