@@ -44,4 +44,14 @@ public class Virus extends Obstacle {
 
         return this.staticA;
     }
+
+    @Override
+    public void colideWithPlayer() {
+        this.remove = true;
+
+        GamePlay.getGP().life -= 25;
+
+        GamePlay.getGP().setChanged();
+        GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+    }
 }

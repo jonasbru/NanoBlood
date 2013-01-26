@@ -17,42 +17,39 @@ import org.newdawn.slick.geom.Rectangle;
  *
  * @author jonas
  */
- public class Player extends Sprite {
-	private final Body body;
-	private Vec2 topImpulseVec = new Vec2(0.0f, 1000.0f);
-	private Vec2 downImpulseVec = new Vec2(0.0f, -1000.0f);
-	protected static final float INIT_X = 43;
-	protected static final float INIT_Y = 13;
-	protected static final float WIDTH = 42;
-	protected static final float HEIGHT = 43;
+public class Player extends Sprite {
+
+    private final Body body;
+    private Vec2 topImpulseVec = new Vec2(0.0f, 5000.0f);
+    private Vec2 downImpulseVec = new Vec2(0.0f, -5000.0f);
+    protected static final float INIT_X = 43;
+    protected static final float INIT_Y = 13;
+    protected static final float WIDTH = 42;
+    protected static final float HEIGHT = 43;
 
     private enum Anim {
 
         STATIC, UP_GO, UP_BACK, DOWN_GO, DOWN_BACK
     }
     Anim currentAnim;
-
     Image staticShip;
-
     Animation downGo;
     Animation downBack;
     Animation upGo;
     Animation upBack;
-
     Image canons;
-
     final int VERTICAL_SPEED = 8;
-	
-	public int getWidth() {
-		return this.staticShip.getWidth();
-	}
 
-	public int getHeight() {
-		return this.staticShip.getHeight();
-	}
+    public int getWidth() {
+        return this.staticShip.getWidth();
+    }
 
-	public Player(Body body) throws SlickException {
-		this.body = body;
+    public int getHeight() {
+        return this.staticShip.getHeight();
+    }
+
+    public Player(Body body) throws SlickException {
+        this.body = body;
         this.staticShip = Sprite.getImage("sprites/player/static.png");
         this.canons = Sprite.getImage("sprites/player/canons.png");
         this.canons.rotate(90);
@@ -92,15 +89,15 @@ import org.newdawn.slick.geom.Rectangle;
 
     @Override
     public Renderable getRenderable() {
-		//* Updating graphics
-		Vec2 pos = body.getPosition();
-		float x = GamePlay.m2px(pos.x) % Main.width;
-		float y = GamePlay.yFromPhysicsToSlick(GamePlay.m2px(pos.y));
-		this.coords.setLocation(x, y);
-		this.boundingBox.setY(y);
-		this.boundingBox.setX(x);
-		//* Sending actual renderable
-		switch (this.currentAnim) {
+        //* Updating graphics
+        Vec2 pos = body.getPosition();
+        float x = GamePlay.m2px(pos.x) % Main.width;
+        float y = GamePlay.yFromPhysicsToSlick(GamePlay.m2px(pos.y));
+        this.coords.setLocation(x, y);
+        this.boundingBox.setY(y);
+        this.boundingBox.setX(x);
+        //* Sending actual renderable
+        switch (this.currentAnim) {
             case UP_GO:
                 return this.upGo;
 
@@ -118,7 +115,7 @@ import org.newdawn.slick.geom.Rectangle;
     }
 
     public void goUp() {
-		body.applyLinearImpulse(topImpulseVec, body.getPosition());
+        body.applyLinearImpulse(topImpulseVec, body.getPosition());
 
         if (currentAnim != Anim.UP_GO && this.upGo.isStopped()) {
             this.upBack.stop();

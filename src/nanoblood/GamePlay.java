@@ -33,7 +33,11 @@ import org.newdawn.slick.state.StateBasedGame;
  * @author jonas
  */
 public class GamePlay extends BasicGameState implements IObservable {
-
+    
+    private static GamePlay gp = null;
+    public static GamePlay getGP() {
+        return gp;
+    }
     class Pair<T1, T2> {
 
         public T1 first;
@@ -43,15 +47,14 @@ public class GamePlay extends BasicGameState implements IObservable {
     Player player;
     LevelManager levelManager;
     List<StaticObject> objects;
-    
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
-    final int bloodSpeedImpulse = 3;
+    final int bloodSpeedImpulse = 1;
     final double bloodSpeedDecrease = 0.01;
     static public final int IMPULSE_COEFF_SLOW = 13;
     static public final int IMPULSE_COEFF_MEDIUM = 16;
-    static public final int IMPULSE_COEFF_HARD = 20;
-    static public final int IMPULSE_COEFF_CRAZY = 30;
+    static public final int IMPULSE_COEFF_HARD = 16; //20 avant
+    static public final int IMPULSE_COEFF_CRAZY = 16; //30 avant
     private Vec2 gravity;
 //	private BodyDef gndBodydef;
 //	private Body gndBody;
@@ -64,10 +67,10 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int velocityIterations;
     private int positionIterations;
     private World world;
-    int totalDistance = 0;
-    int nextDistancePopObstacle;
+    //Pop obstacles
+    int nextDistancePopObstacle = 0;
     int deltaDistancePopObstacle = 200;
-
+    int totalDistance = 0;
     private Vec2 speedImpulse;
     private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
     //* Note : Those values are heartbeat rhythms...
@@ -80,23 +83,20 @@ public class GamePlay extends BasicGameState implements IObservable {
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
     private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
-    
-    private int score;
-    private float life;
-    
+    int score;
+    float life;
     // TODO timer
-
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
     HeartBeatDisplay heartBeatDisplay;
-    
     // Observable vars
     private boolean hasChanged;
     private ArrayList<IObserver> observers;
-    
+
     GamePlay(int stateID) {
         this.stateID = stateID;
+        gp = this;
     }
 
     @Override
@@ -110,29 +110,27 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.player = new Player(playerBody);
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<StaticObject>();
-        
+
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
-        
+
         // TODO declarer parametres dans un fichier properties : WIP non pushé
         score = 0;
         life = 100;
-        
+
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
         this.lifeDisplay = new LifeDisplay();
         this.heartBeatDisplay = new HeartBeatDisplay();
-        
+
         // Add observers
         this.observers.add(scoreDisplay);
         this.observers.add(lifeDisplay);
         this.observers.add(heartBeatDisplay);
-        
+
         // Notify for 1st time
         this.setChanged();
         this.notifyObservers();
-
-        nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
 
         player.setCoords(200, Main.height / 2);
 
@@ -163,7 +161,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
         this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
-        
+
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
         this.lifeDisplay.render(gc, sbg, grphcs);
@@ -184,11 +182,11 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
         manageColisions();
-        
+
         if (life <= 0) {
             // TODO game over screen
         }
-        
+
         // DEBUG score
         score = (int) bloodSpeed;
         setChanged();
@@ -200,9 +198,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         if (currentHeartBeat > HEARTBEAT_THRESHOLD_CRAZY) {
             coeff = IMPULSE_COEFF_CRAZY;
         } else if (currentHeartBeat > HEARTBEAT_THRESHOLD_HARD) {
-            coeff = IMPULSE_COEFF_CRAZY;
+            coeff = IMPULSE_COEFF_HARD;
         } else if (currentHeartBeat > HEARTBEAT_THRESHOLD_MEDIUM) {
-            coeff = IMPULSE_COEFF_CRAZY;
+            coeff = IMPULSE_COEFF_MEDIUM;
         } else {
             coeff = IMPULSE_COEFF_SLOW;
         }
@@ -227,18 +225,18 @@ public class GamePlay extends BasicGameState implements IObservable {
             playerHeartBeat(delta);
 
         }
-        
+
         // Update HB display
         this.setChanged();
         notifyObserver(heartBeatDisplay);
-        
+
         // DEBUG score
         if (input.isKeyPressed(Input.KEY_TAB)) {
             score += 100;
             setChanged();
             notifyObserver(scoreDisplay);
         }
-        
+
         // DEBUG life
         if (input.isKeyPressed(Input.KEY_A)) {
             if (life > 0) {
@@ -247,15 +245,16 @@ public class GamePlay extends BasicGameState implements IObservable {
             setChanged();
             notifyObserver(lifeDisplay);
         }
-
-        totalDistance += bloodSpeed;//@TODO change that
     }
 
     private void updateObjects() {
         List<StaticObject> toRemove = new ArrayList<StaticObject>();
 
+        int deltaMove = (int) (-1.0f * this.playerBody.getLinearVelocity().x / 3.0f);
+        totalDistance -= deltaMove;
+
         for (StaticObject so : this.objects) {
-            so.move((int) (-1.0f * this.playerBody.getLinearVelocity().x / 3.0f), 0);
+            so.move(deltaMove, 0);
 
             if (so instanceof Cancer) {
                 float deltaX = (float) (m2px(playerBody.getPosition().x) - so.coords.getX());
@@ -265,8 +264,6 @@ public class GamePlay extends BasicGameState implements IObservable {
                 v = v.normalise();
 
                 so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
-
-//                            System.out.println(so.coords + "    " + playerBody.getPosition());
             }
 
             if (so.coords.getX() < -50) {
@@ -284,7 +281,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         for (StaticObject so : this.objects) {
             if (this.player.boundingBox.intersects(so.getBoundingBox())) {
                 so.colideWithPlayer();
-                
+
                 // TODO update life value
             }
         }
@@ -398,21 +395,20 @@ public class GamePlay extends BasicGameState implements IObservable {
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
     }
-    
+
     public int getScore() {
         return score;
     }
-    
+
     public float getLife() {
         return life;
     }
-    
+
     public float getHeartBeat() {
         return bloodSpeed;
     }
-    
-    // --- Observer methods
 
+    // --- Observer methods
     @Override
     public void addObserver(IObserver o) {
         observers.add(o);
@@ -437,7 +433,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public boolean hasChanged() {
         return hasChanged;
     }
-    
+
     @Override
     public void notifyObserver(IObserver o) {
         if (hasChanged() && observers.indexOf(o) != -1) {
@@ -445,7 +441,7 @@ public class GamePlay extends BasicGameState implements IObservable {
             clearChanged();
         }
     }
-    
+
     @Override
     public void notifyObservers() {
         if (hasChanged()) {
@@ -455,12 +451,12 @@ public class GamePlay extends BasicGameState implements IObservable {
             clearChanged();
         }
     }
-    
+
     protected void clearChanged() {
         hasChanged = false;
     }
-    
-    protected void setChanged() {
+
+    public void setChanged() {
         hasChanged = true;
     }
 }
