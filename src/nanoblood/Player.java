@@ -28,8 +28,16 @@ public class Player extends Sprite {
     Animation up;
 
     final int VERTICAL_SPEED = 8;
+	
+	public int getWidth() {
+		return this.staticShip.getWidth();
+	}
 
-    public Player() throws SlickException {
+	public int getHeight() {
+		return this.staticShip.getHeight();
+	}
+
+	public Player() throws SlickException {
         this.staticShip = Sprite.getImage("sprites/player/static.png");
 
         this.boundingBox = new Rectangle(43, 13, 42, 43);
