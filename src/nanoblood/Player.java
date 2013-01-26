@@ -95,7 +95,7 @@ import org.newdawn.slick.geom.Rectangle;
 		//* Updating graphics
 		Vec2 pos = body.getPosition();
 		float x = GamePlay.m2px(pos.x) % Main.width;
-		float y = GamePlay.m2px(GamePlay.yFromPhysicsToSlick(pos.y));
+		float y = GamePlay.yFromPhysicsToSlick(GamePlay.m2px(pos.y));
 		this.coords.setLocation(x, y);
 		this.boundingBox.setY(y);
 		this.boundingBox.setX(x);
