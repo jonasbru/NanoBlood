@@ -64,6 +64,7 @@ public class GamePlay extends BasicGameState {
 	private int heartBeatsSinceLastUpdate = 0;
 	protected static final float PIXELS_TO_METERS_RATIO = 10.0f;
 	static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
+	private static boolean DBG = true;
 	
 
 	GamePlay(int stateID) {
@@ -274,7 +275,7 @@ public class GamePlay extends BasicGameState {
 		return (int) (m * PIXELS_TO_METERS_RATIO);
 	}
 
-	private double heartBeatAvgInterval = 2.0; // In seconds
+	private double heartBeatAvgInterval = 10.0; // In seconds
 	private int heartBeatTimer = 0; // in "delta" units
 	private void updateCurrentHeartBeats(int delta) {
 		heartBeatTimer += delta;
@@ -284,6 +285,9 @@ public class GamePlay extends BasicGameState {
 			// Resetting values:
 			heartBeatTimer -= heartBeatAvgInterval*1000;
 			heartBeatsSinceLastUpdate = 0;
+			if (DBG) {
+				System.out.println("currentHeartBeat=" + currentHeartBeat);
+			}
 		}
 		
 	}
