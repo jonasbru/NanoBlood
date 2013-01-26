@@ -19,8 +19,8 @@ import org.newdawn.slick.geom.Rectangle;
  */
  public class Player extends Sprite {
 	private final Body body;
-	private Vec2 topImpulseVec = new Vec2(0.0f, 10.0f);
-	private Vec2 downImpulseVec = new Vec2(0.0f, -10.0f);
+	private Vec2 topImpulseVec = new Vec2(0.0f, 1000.0f);
+	private Vec2 downImpulseVec = new Vec2(0.0f, -1000.0f);
 	protected static final float INIT_X = 43;
 	protected static final float INIT_Y = 13;
 	protected static final float WIDTH = 42;
@@ -94,7 +94,7 @@ import org.newdawn.slick.geom.Rectangle;
     public Renderable getRenderable() {
 		//* Updating graphics
 		Vec2 pos = body.getPosition();
-		float x = GamePlay.m2px(pos.x);
+		float x = GamePlay.m2px(pos.x) % Main.width;
 		float y = GamePlay.m2px(GamePlay.yFromPhysicsToSlick(pos.y));
 		this.coords.setLocation(x, y);
 		this.boundingBox.setY(y);
@@ -118,7 +118,7 @@ import org.newdawn.slick.geom.Rectangle;
     }
 
     public void goUp() {
-		body.applyLinearImpulse(downImpulseVec, body.getPosition());
+		body.applyLinearImpulse(topImpulseVec, body.getPosition());
 
         if (currentAnim != Anim.UP_GO && this.upGo.isStopped()) {
             this.upBack.stop();

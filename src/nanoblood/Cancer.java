@@ -24,6 +24,8 @@ public class Cancer extends Obstacle {
 
     Animation staticA;
 
+    public static final int MOVEMENT_TO_PLAYER = 2;
+
     public Cancer() throws SlickException {
 
         this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getX() + 50, 20);

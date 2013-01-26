@@ -17,6 +17,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -104,6 +105,8 @@ public class GamePlay extends BasicGameState {
 
 		this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
 		this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
+                
+System.out.println(this.player.getCoords());
 	}
 
 	@Override
@@ -165,6 +168,19 @@ public class GamePlay extends BasicGameState {
 
 		for (StaticObject so : this.objects) {
 			so.move((int) (- 1.0f * this.playerBody.getLinearVelocity().x / 3.0f), 0);
+
+                        if(so instanceof Cancer) {
+                            float deltaX = (float) (m2px(playerBody.getPosition().x) - so.coords.getX());
+                            float deltaY = (float) (ySlick2Physics(m2px(playerBody.getPosition().y)) - so.coords.getY());
+
+                            Vector2f v = new Vector2f(deltaX, deltaY);
+                            v = v.normalise();
+
+                            so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
+
+//                            System.out.println(so.coords + "    " + playerBody.getPosition());
+                        }
+
 			if (so.coords.getX() < -50) {
 				toRemove.add(so);
 			}
@@ -221,8 +237,8 @@ public class GamePlay extends BasicGameState {
 //		gndBody.createFixture(gndBox, 0.0f);
 		playerBodyDef = new BodyDef();
 		playerBodyDef.type = BodyType.DYNAMIC;
-		playerBodyDef.position.x = (float) Main.width / 2;
-		playerBodyDef.position.y = ySlick2Physics(Player.INIT_Y);
+		playerBodyDef.position.x = px2m(Main.width / 2);
+		playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
 		playerBody = world.createBody(playerBodyDef);
 		playerShape = new PolygonShape();
 		playerShape.setAsBox(Player.WIDTH / 2, Player.HEIGHT / 2);

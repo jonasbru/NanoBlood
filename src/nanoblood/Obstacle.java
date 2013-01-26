@@ -15,7 +15,7 @@ public abstract class Obstacle extends StaticObject {
 
     public static Obstacle getRandomObstacle() throws SlickException {
         int rand = (int) (Math.random() * 5);
-        if(rand < 1) {
+        if(rand < 5) {
             return new Cancer();
         }
         if(rand < 2) {
