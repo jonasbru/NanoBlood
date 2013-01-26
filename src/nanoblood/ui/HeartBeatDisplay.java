@@ -29,7 +29,7 @@ public class HeartBeatDisplay implements IObserver {
     public static final int CONTENT_X_OFFSET = 83;
     public static final int CONTENT_Y_OFFSET = 11;
     public static final int MIN_HB = 0; // get values from properties (or Gameplay)
-    public static final int MAX_HB = 30;
+    public static final int MAX_HB = 200;
     private float heartBeat;
     private Image heartBeatBackground;
 
@@ -41,7 +41,7 @@ public class HeartBeatDisplay implements IObserver {
     @Override
     public void update(IObservable obs, Object obj) {
         if (obs instanceof GamePlay) {
-            heartBeat = ((GamePlay) obs).getHeartBeat();
+            heartBeat = ((GamePlay) obs).getCurrentHeartBeat();
         }
     }
 

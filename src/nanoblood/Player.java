@@ -4,6 +4,9 @@
  */
 package nanoblood;
 
+import java.awt.Point;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
@@ -14,7 +17,14 @@ import org.newdawn.slick.geom.Rectangle;
  *
  * @author jonas
  */
-public class Player extends Sprite {
+ public class Player extends Sprite {
+	private final Body body;
+	private Vec2 topImpulseVec = new Vec2(0.0f, 1000.0f);
+	private Vec2 downImpulseVec = new Vec2(0.0f, -1000.0f);
+	protected static final float INIT_X = 43;
+	protected static final float INIT_Y = 13;
+	protected static final float WIDTH = 42;
+	protected static final float HEIGHT = 43;
 
     private enum Anim {
 
@@ -32,13 +42,22 @@ public class Player extends Sprite {
     Image canons;
 
     final int VERTICAL_SPEED = 8;
+	
+	public int getWidth() {
+		return this.staticShip.getWidth();
+	}
 
-    public Player() throws SlickException {
+	public int getHeight() {
+		return this.staticShip.getHeight();
+	}
+
+	public Player(Body body) throws SlickException {
+		this.body = body;
         this.staticShip = Sprite.getImage("sprites/player/static.png");
         this.canons = Sprite.getImage("sprites/player/canons.png");
         this.canons.rotate(90);
 
-        this.boundingBox = new Rectangle(43, 13, 42, 43);
+        this.boundingBox = new Rectangle(INIT_X, INIT_Y, WIDTH, HEIGHT);
 
         Image anim[] = new Image[5];
         for (int i = 0; i < anim.length; i++) {
@@ -73,7 +92,15 @@ public class Player extends Sprite {
 
     @Override
     public Renderable getRenderable() {
-        switch (this.currentAnim) {
+		//* Updating graphics
+		Vec2 pos = body.getPosition();
+		float x = GamePlay.m2px(pos.x) % Main.width;
+		float y = GamePlay.yFromPhysicsToSlick(GamePlay.m2px(pos.y));
+		this.coords.setLocation(x, y);
+		this.boundingBox.setY(y);
+		this.boundingBox.setX(x);
+		//* Sending actual renderable
+		switch (this.currentAnim) {
             case UP_GO:
                 return this.upGo;
 
@@ -91,8 +118,7 @@ public class Player extends Sprite {
     }
 
     public void goUp() {
-        this.coords.setLocation(this.coords.getX(), this.coords.getY() - VERTICAL_SPEED);
-        this.boundingBox.setY(boundingBox.getY() - VERTICAL_SPEED);
+		body.applyLinearImpulse(topImpulseVec, body.getPosition());
 
         if (currentAnim != Anim.UP_GO && this.upGo.isStopped()) {
             this.upBack.stop();
@@ -106,8 +132,7 @@ public class Player extends Sprite {
     }
 
     public void goDown() {
-        this.coords.setLocation(this.coords.getX(), this.coords.getY() + VERTICAL_SPEED);
-        this.boundingBox.setY(boundingBox.getY() + VERTICAL_SPEED);
+        body.applyLinearImpulse(downImpulseVec, body.getPosition());
 
         if (currentAnim != Anim.DOWN_GO && this.downGo.isStopped()) {
             this.upGo.stop();
