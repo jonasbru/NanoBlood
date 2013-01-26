@@ -18,6 +18,7 @@ import org.jbox2d.dynamics.World;
 import nanoblood.ui.HeartBeatDisplay;
 import nanoblood.ui.LifeDisplay;
 import nanoblood.ui.ScoreDisplay;
+import nanoblood.util.GameParams;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
 import org.newdawn.slick.GameContainer;
@@ -81,10 +82,8 @@ public class GamePlay extends BasicGameState implements IObservable {
     private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
     
-    
-    
-    
-    // TODO timer
+    long lastTick;
+    long elapsedTime;
 
     // UI elements
     private int score; // score board value
@@ -116,9 +115,8 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
         
-        // TODO declarer parametres dans un fichier properties : WIP non pushé
         score = 0;
-        life = 100;
+        life = 150;  // TODO
         
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
@@ -133,6 +131,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         // Notify for 1st time
         this.setChanged();
         this.notifyObservers();
+        
+        lastTick = System.currentTimeMillis();
+        elapsedTime = 0;
 
         nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
 
@@ -174,6 +175,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
+        
         removeObjects();
         addObjects();
 
@@ -187,14 +189,23 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         manageColisions();
         
-        if (life <= 0) {
-            // TODO game over screen
+        // Update score very second
+        long currentTime = System.currentTimeMillis();
+        elapsedTime = currentTime - lastTick;
+        if (elapsedTime >= 1000) {
+            elapsedTime -= 1000;
+            lastTick = currentTime;
+            
+            float scoreModifier = getScoreModifier();
+            System.out.println("HB: " +currentHeartBeat + ", Modifier: " + scoreModifier);
+            addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
         }
         
-        // DEBUG score
-        score = (int) bloodSpeed;
-        setChanged();
-        notifyObserver(scoreDisplay);
+        
+        // TODO game over screen
+        if (life <= 0) {
+            
+        }
     }
 
     private float computeImpulseFromHeartBeat(int hb) {
@@ -386,7 +397,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
         currentHeartBeat = (int) ((double) sum / (double) (heartBeatAvgInterval) * 60.0);//Average on {heartBeatAvgInterval} seconds, that we put on a 60seconds basis
         if (DBG) {
-            System.out.println("currentHeartBeat=" + currentHeartBeat);
+            //System.out.println("currentHeartBeat=" + currentHeartBeat);
         }
     }
 
@@ -411,6 +422,34 @@ public class GamePlay extends BasicGameState implements IObservable {
     
     public int getCurrentHeartBeat() {
         return currentHeartBeat;
+    }
+    
+    public float getScoreModifier() {
+        if (currentHeartBeat <= 0) {
+            return 0;
+        }
+        else if (currentHeartBeat > 0 && currentHeartBeat <= GameParams.INSTANCE.LowBeatThreshold()) {
+            return GameParams.INSTANCE.ScoreModifierLow();
+        }
+        else if (currentHeartBeat >= GameParams.INSTANCE.HighBeatThreshold()) {
+            return GameParams.INSTANCE.ScoreModifierHigh();
+        }
+        else {
+            return GameParams.INSTANCE.ScoreModifierNormal();
+        }
+    }
+    
+    public void addLife(int dLife) {
+        life = life + dLife < 0 ? 0 : life + dLife;   
+        setChanged();
+        notifyObserver(lifeDisplay);
+    }
+    
+    public void addScore(int dScore) {
+        score += dScore;
+        setChanged();
+        notifyObserver(scoreDisplay);
+        System.out.println("+Score: " + score);
     }
     
     // --- Observer methods

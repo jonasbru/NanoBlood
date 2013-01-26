@@ -17,41 +17,19 @@ public enum GameParams {
     
     INSTANCE;
     
-    private Properties prop;
-    
-    // Scoring
-    public static int   ScorePerSecond      = 10;
-    public static float ScoreModifierLow    = 0.5f;
-    public static float ScoreModifierNormal = 1f;
-    public static float ScoreModifierHigh   = 3f;
-    
-    // Heart beat
-    public static int   BeatBoost           = 3;
-    public static float BeatDecreaseRate    = 0.01f;
-    public static int   MaxBeat             = 30;
-    public static float LowBeatThreshold    = 10f;
-    public static float HighBeatThreshold   = 20;
-    
-    // Life
-    public static int   MaxLife             = 150;
-    
-    // Maps
-    public static String Maps = "1, 2, 3";
-    public static String MapsSpawnRate= "1, 1, 1";
-    public static boolean HorizontalFlipping=false;
-    
+    private Properties prop;   
     
     private GameParams() {
         prop = new Properties();
         try {
             prop.load(new FileInputStream("data/GameParams.properties"));
             
-            
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
     
+    // Scoring
     public int ScorePerSecond() {
         return Integer.parseInt(prop.getProperty("ScorePerSecond"));
     }
@@ -67,4 +45,36 @@ public enum GameParams {
     public float ScoreModifierHigh() {
         return Float.parseFloat(prop.getProperty("ScoreModifierHigh"));
     }
+    
+    // Heart beat
+    public int BeatBoost() {
+        return Integer.parseInt(prop.getProperty("BeatBoost"));
+    }
+    
+    public float BeatDecreaseRate() {
+        return Float.parseFloat(prop.getProperty("BeatDecreaseRate"));
+    }
+    
+    public float MaxBeat() {
+        return Float.parseFloat(prop.getProperty("MaxBeat"));
+    }
+    
+    public float LowBeatThreshold() {
+        return Float.parseFloat(prop.getProperty("LowBeatThreshold"));
+    }
+    
+    public float HighBeatThreshold() {
+        return Float.parseFloat(prop.getProperty("HighBeatThreshold"));
+    }
+    
+    // Life
+    public int MaxLife() {
+        return Integer.parseInt(prop.getProperty("MaxLife"));
+    }
+    
+    // TODO damages
+    
+    // TODO Maps
+    
+    
 }
