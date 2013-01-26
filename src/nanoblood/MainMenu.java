@@ -11,7 +11,6 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
-import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.gui.MouseOverArea;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -19,15 +18,19 @@ import org.newdawn.slick.state.StateBasedGame;
 
 /**
  *
- * @author jonas
+ * @author jammerzzz
  */
 public class MainMenu extends BasicGameState implements ComponentListener {
 
     int stateID = -1;
 
     Image bg;
-	private CustomMouseOverArea sound;
+	private MouseOverArea soundCurrent, soundOn, soundOff;
 	protected static boolean SOUND_ON = true;
+	private MouseOverArea play;
+	private Image soundOffImg;
+	private Image soundOnImg;
+	private GameContainer lastgc;
    
 
     MainMenu(int stateID) {
@@ -41,57 +44,35 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         bg = new Image("sprites/main_menu.jpg");
-		sound = new CustomMouseOverArea(gc, Sprite.getImage("sprites/sound_menu_ON.png"), (int)0.8 * Main.width, (int) 0.8 * Main.height, this);
-		sound.setSelectedImage(Sprite.getImage("sprites/sound_menu_ON.png"));
+		soundOffImg = Sprite.getImage("sprites/sound_menu_OFF.png");
+		soundOnImg = Sprite.getImage("sprites/sound_menu_ON.png");
+		soundOn = new MouseOverArea(gc, soundOnImg, (int)(0.8 * Main.width), (int) (0.8 * Main.height), this);
+		soundOff = new MouseOverArea(gc, soundOffImg, (int)(0.8 * Main.width), (int) (0.8 * Main.height), this);
+		soundCurrent = soundOn;//By default, sound is activated
+		play = new MouseOverArea(gc, Sprite.getImage("sprites/play.png"), (int)(0.3 * Main.width), (int)(0.3*Main.height), this);
+		play.setMouseOverImage(Sprite.getImage("sprites/play_mouseover.png"));
     }
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
         bg.draw(0, 0);
-        sound.render(gc, grphcs);
+        soundCurrent.render(gc, grphcs);
+		play.render(gc, grphcs);
     }
 
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
+		this.lastgc = gc;
     }
 
 	public void componentActivated(AbstractComponent source) {
-		if (sound == source) {
-			SOUND_ON = false;
+		if (soundCurrent == source) {
+			if (SOUND_ON) {
+				SOUND_ON = false;
+				soundCurrent = soundOff;
+			} else {
+				SOUND_ON = true;
+				soundCurrent = soundOn;
+			}
 		}
 	}
 
-}
-class CustomMouseOverArea extends MouseOverArea {
-
-    private boolean selected = false;
-	private Image img;
-	private Image selectedImg;
-
-    public CustomMouseOverArea(GUIContext container, Image image, int x, int y, ComponentListener listener) {
-        super(container, image, x, y, listener);
-		this.img = image;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-	
-	public void setSelectedImage(Image i) {
-		this.selectedImg = i;
-	}
-	
-	public void setImage(Image i) {
-		this.img = i;
-	}
-	
-	public Image getImage() {
-		if(this.selected) {
-			return this.selectedImg;
-		} else {
-			return this.img;
-		}
-	}
 }
