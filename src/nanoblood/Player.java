@@ -93,8 +93,7 @@ public class Player extends Sprite {
     }
 
     public void goDown() {
-        this.coords.setLocation(this.coords.getX(), this.coords.getY() + VERTICAL_SPEED);
-        this.boundingBox.setY(boundingBox.getY() + VERTICAL_SPEED);
+        setY(boundingBox.getY() + VERTICAL_SPEED);
 
         this.down.start();
         this.up.stop();
@@ -102,6 +101,17 @@ public class Player extends Sprite {
 
         currentAnim = Anim.DOWN;
     }
+	
+	public void setY(float y) {
+		this.coords.setLocation(this.coords.getX(), y);
+		boundingBox.setY(y);
+	}
+	
+	void setX(float x) {
+		this.coords.setLocation(x, this.coords.getY());
+		boundingBox.setY(x);
+	}
+
 
     public void stop() {
         this.staticA.start();

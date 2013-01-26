@@ -33,6 +33,18 @@ public class GamePlay extends BasicGameState {
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 3;
     final double bloodSpeedDecrease = 0.01;
+	private Vec2 gravity;
+	private BodyDef gndBodydef;
+	private Body gndBody;
+	private PolygonShape gndBox;
+	private BodyDef playerBodyDef;
+	private Body playerBody;
+	private PolygonShape playerShape;
+	private FixtureDef playerFD;
+	private float timeStep;
+	private int velocityIterations;
+	private int positionIterations;
+	private World world;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -66,7 +78,7 @@ public class GamePlay extends BasicGameState {
             so.getRenderable().draw((float) so.coords.getX(), (float) so.coords.getY());
         }
 
-        this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
+        this.player.getRenderable().draw((float)this.player.getCoords().getX(), (float) this.player.getCoords().getY());
     }
 
     @Override
@@ -75,6 +87,7 @@ public class GamePlay extends BasicGameState {
 
         manageInput(gc, sbg, i);
 
+		updatePhysics();
         updateObjects();
 
         this.levelManager.update(this.bloodSpeed);
@@ -143,24 +156,34 @@ public class GamePlay extends BasicGameState {
     }
 
 	private void initPhysics() {
-		Vec2 gravity = new Vec2(10.0f, 0);
-		World world = new World(gravity, true);
-		BodyDef gndBodydef = new BodyDef();
+		gravity = new Vec2(100.0f, 0);
+		world = new World(gravity, true);
+		gndBodydef = new BodyDef();
 		gndBodydef.position.set(0.0f, (float)(0.2 * Main.width));
-		Body gndBody = world.createBody(gndBodydef);
-		PolygonShape gndBox = new PolygonShape();
+		gndBody = world.createBody(gndBodydef);
+		gndBox = new PolygonShape();
 		gndBox.setAsBox(10.0f, (float)Main.width);
 		gndBody.createFixture(gndBox, 0.0f);
-		BodyDef playerBodyDef = new BodyDef();
+		playerBodyDef = new BodyDef();
 		playerBodyDef.type = BodyType.DYNAMIC;
 		playerBodyDef.position.x = (float)Main.width / 2;
 		playerBodyDef.position.y = (float)this.player.getCoords().getY();
-		Body playerBody = world.createBody(playerBodyDef);
-		PolygonShape playerShape = new PolygonShape();
+		playerBody = world.createBody(playerBodyDef);
+		playerShape = new PolygonShape();
 		playerShape.setAsBox(this.player.getWidth()/2, this.player.getHeight()/2);
-		FixtureDef playerFD = new FixtureDef();
+		playerFD = new FixtureDef();
 		playerFD.shape = playerShape;
 		playerFD.density = 1.0f;
 		playerFD.friction =  0.3f;
+		playerBody.createFixture(playerFD);
+		timeStep = 1.0f/60.0f;
+		velocityIterations = 6;
+		positionIterations = 2;
+	}
+
+	private void updatePhysics() {
+		world.step(timeStep, velocityIterations, positionIterations);
+		this.player.setY(playerBody.getPosition().y);
+		this.player.setX(playerBody.getPosition().x);
 	}
 }
