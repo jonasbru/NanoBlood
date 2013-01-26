@@ -40,7 +40,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         public T2 second;
     }
     int stateID = -1;
-    Player player;
+    PhysicsObject player;
     LevelManager levelManager;
     List<StaticObject> objects;
     
@@ -133,9 +133,6 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.notifyObservers();
 
         nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
-
-        player.setCoords(200, Main.height / 2);
-
         for (int i = 0; i < 6; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
@@ -162,7 +159,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
-        this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
+        ((Player)player.getSprite()).getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
         
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
@@ -217,12 +214,12 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (input.isKeyDown(Input.KEY_UP)) {
             player.move(Player.upImpulseVec);
-            player.goUp();
+            ((Player)player.getSprite()).goUp();
         } else if (input.isKeyDown(Input.KEY_DOWN)) {
             player.move(Player.upImpulseVec);
-            player.goDown();
+            ((Player)player.getSprite()).goDown();
         } else {
-            player.stop();
+            ((Player)player.getSprite()).stop();
         }
 
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
@@ -284,7 +281,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private void manageColisions() {
 
         for (StaticObject so : this.objects) {
-            if (this.player.boundingBox.intersects(so.getBoundingBox())) {
+            if (this.player.getSprite().boundingBox.intersects(so.getBoundingBox())) {
                 so.colideWithPlayer();
                 
                 // TODO update life value
