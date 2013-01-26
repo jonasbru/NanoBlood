@@ -234,14 +234,14 @@ public class GamePlay extends BasicGameState implements IObservable {
         notifyObserver(heartBeatDisplay);
 
         // DEBUG score
-        if (input.isKeyPressed(Input.KEY_TAB)) {
+        if (DBG && input.isKeyPressed(Input.KEY_TAB)) {
             score += 100;
             setChanged();
             notifyObserver(scoreDisplay);
         }
 
         // DEBUG life
-        if (input.isKeyPressed(Input.KEY_A)) {
+        if (DBG && input.isKeyPressed(Input.KEY_A)) {
             if (life > 0) {
                 life -= 10;
             }
@@ -409,6 +409,10 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     public float getHeartBeat() {
         return bloodSpeed;
+    }
+    
+    public int getCurrentHeartBeat() {
+        return currentHeartBeat;
     }
 
     // --- Observer methods
