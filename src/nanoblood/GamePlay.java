@@ -4,13 +4,10 @@
  */
 package nanoblood;
 
-import java.security.Timestamp;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -18,6 +15,11 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import nanoblood.ui.HeartBeatDisplay;
+import nanoblood.ui.LifeDisplay;
+import nanoblood.ui.ScoreDisplay;
+import nanoblood.util.IObservable;
+import nanoblood.util.IObserver;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -30,7 +32,7 @@ import org.newdawn.slick.state.StateBasedGame;
  *
  * @author jonas
  */
-public class GamePlay extends BasicGameState {
+public class GamePlay extends BasicGameState implements IObservable {
 
     class Pair<T1, T2> {
 
@@ -41,6 +43,8 @@ public class GamePlay extends BasicGameState {
     Player player;
     LevelManager levelManager;
     List<StaticObject> objects;
+    
+    // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 3;
     final double bloodSpeedDecrease = 0.01;
@@ -63,6 +67,7 @@ public class GamePlay extends BasicGameState {
     int totalDistance = 0;
     int nextDistancePopObstacle;
     int deltaDistancePopObstacle = 200;
+
     private Vec2 speedImpulse;
     private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
     //* Note : Those values are heartbeat rhythms...
@@ -75,7 +80,21 @@ public class GamePlay extends BasicGameState {
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
     private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
+    
+    private int score;
+    private float life;
+    
+    // TODO timer
 
+    // UI elements
+    ScoreDisplay scoreDisplay;
+    LifeDisplay lifeDisplay;
+    HeartBeatDisplay heartBeatDisplay;
+    
+    // Observable vars
+    private boolean hasChanged;
+    private ArrayList<IObserver> observers;
+    
     GamePlay(int stateID) {
         this.stateID = stateID;
     }
@@ -91,6 +110,27 @@ public class GamePlay extends BasicGameState {
         this.player = new Player(playerBody);
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<StaticObject>();
+        
+        this.hasChanged = false;
+        this.observers = new ArrayList<IObserver>();
+        
+        // TODO declarer parametres dans un fichier properties : WIP non pushé
+        score = 0;
+        life = 100;
+        
+        // Create UI elements
+        this.scoreDisplay = new ScoreDisplay();
+        this.lifeDisplay = new LifeDisplay();
+        this.heartBeatDisplay = new HeartBeatDisplay();
+        
+        // Add observers
+        this.observers.add(scoreDisplay);
+        this.observers.add(lifeDisplay);
+        this.observers.add(heartBeatDisplay);
+        
+        // Notify for 1st time
+        this.setChanged();
+        this.notifyObservers();
 
         nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
 
@@ -123,8 +163,11 @@ public class GamePlay extends BasicGameState {
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
         this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
-
-        System.out.println(this.player.getCoords());
+        
+        // UI : render last
+        this.scoreDisplay.render(gc, sbg, grphcs);
+        this.lifeDisplay.render(gc, sbg, grphcs);
+        this.heartBeatDisplay.render(gc, sbg, grphcs);
     }
 
     @Override
@@ -141,6 +184,15 @@ public class GamePlay extends BasicGameState {
         this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
         manageColisions();
+        
+        if (life <= 0) {
+            // TODO game over screen
+        }
+        
+        // DEBUG score
+        score = (int) bloodSpeed;
+        setChanged();
+        notifyObserver(scoreDisplay);
     }
 
     private float computeImpulseFromHeartBeat(int hb) {
@@ -173,6 +225,27 @@ public class GamePlay extends BasicGameState {
 
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
+
+        }
+        
+        // Update HB display
+        this.setChanged();
+        notifyObserver(heartBeatDisplay);
+        
+        // DEBUG score
+        if (input.isKeyPressed(Input.KEY_TAB)) {
+            score += 100;
+            setChanged();
+            notifyObserver(scoreDisplay);
+        }
+        
+        // DEBUG life
+        if (input.isKeyPressed(Input.KEY_A)) {
+            if (life > 0) {
+                life -= 10;
+            }
+            setChanged();
+            notifyObserver(lifeDisplay);
         }
 
         totalDistance += bloodSpeed;//@TODO change that
@@ -211,6 +284,8 @@ public class GamePlay extends BasicGameState {
         for (StaticObject so : this.objects) {
             if (this.player.boundingBox.intersects(so.getBoundingBox())) {
                 so.colideWithPlayer();
+                
+                // TODO update life value
             }
         }
     }
@@ -322,5 +397,70 @@ public class GamePlay extends BasicGameState {
         playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
+    }
+    
+    public int getScore() {
+        return score;
+    }
+    
+    public float getLife() {
+        return life;
+    }
+    
+    public float getHeartBeat() {
+        return bloodSpeed;
+    }
+    
+    // --- Observer methods
+
+    @Override
+    public void addObserver(IObserver o) {
+        observers.add(o);
+    }
+
+    @Override
+    public int countObservers() {
+        return observers.size();
+    }
+
+    @Override
+    public void deleteObserver(IObserver o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void deleteObservers(IObserver o) {
+        observers.clear();
+    }
+
+    @Override
+    public boolean hasChanged() {
+        return hasChanged;
+    }
+    
+    @Override
+    public void notifyObserver(IObserver o) {
+        if (hasChanged() && observers.indexOf(o) != -1) {
+            observers.get(observers.indexOf(o)).update(this, null);
+            clearChanged();
+        }
+    }
+    
+    @Override
+    public void notifyObservers() {
+        if (hasChanged()) {
+            for (IObserver obs : observers) {
+                obs.update(this, null);
+            }
+            clearChanged();
+        }
+    }
+    
+    protected void clearChanged() {
+        hasChanged = false;
+    }
+    
+    protected void setChanged() {
+        hasChanged = true;
     }
 }
