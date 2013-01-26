@@ -174,7 +174,9 @@ public class GamePlay extends BasicGameState {
 		playerFD = new FixtureDef();
 		playerFD.shape = playerShape;
 		playerFD.density = 1.0f;
-		playerFD.friction =  0.3f;
+		//* The two next lines together allow us to have friction against a number of circles even if we are a circle ourself
+		playerFD.friction =  1.5f;
+		playerBody.setAngularDamping(200);
 		playerBody.createFixture(playerFD);
 		timeStep = 1.0f/60.0f;
 		velocityIterations = 6;
