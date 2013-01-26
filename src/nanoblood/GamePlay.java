@@ -40,9 +40,9 @@ public class GamePlay extends BasicGameState {
 	static public final int IMPULSE_COEFF_CRAZY = 30;
 	
 	private Vec2 gravity;
-	private BodyDef gndBodydef;
-	private Body gndBody;
-	private PolygonShape gndBox;
+//	private BodyDef gndBodydef;
+//	private Body gndBody;
+//	private PolygonShape gndBox;
 	private BodyDef playerBodyDef;
 	private Body playerBody;
 	private PolygonShape playerShape;
@@ -55,7 +55,7 @@ public class GamePlay extends BasicGameState {
 	int nextDistancePopObstacle;
 	int deltaDistancePopObstacle = 200;
 	private Vec2 speedImpulse;
-	private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm
+	private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
 	//* Note : Those values are heartbeat rhythms...
 	private int HEARTBEAT_THRESHOLD_CRAZY = 150;// dying soon
 	private int HEARTBEAT_THRESHOLD_MEDIUM = 90;// quite excited
@@ -117,7 +117,6 @@ public class GamePlay extends BasicGameState {
 	}
 	
 	private float computeImpulseFromHeartBeat(int hb) {
-		float result = 0.0f;
 		int coeff;
 		if (currentHeartBeat > HEARTBEAT_THRESHOLD_CRAZY) {
 			coeff = IMPULSE_COEFF_CRAZY;
@@ -127,7 +126,10 @@ public class GamePlay extends BasicGameState {
 			coeff = IMPULSE_COEFF_CRAZY;
 		} else {
 			coeff = IMPULSE_COEFF_SLOW;
-		} 
+		}
+		
+		float result = coeff * currentHeartBeat;
+		
 		return result;
 	}
 
@@ -209,19 +211,19 @@ public class GamePlay extends BasicGameState {
 	private void initPhysics() {
 		gravity = new Vec2(100.0f, 0);
 		world = new World(gravity, true);
-		gndBodydef = new BodyDef();
-		gndBodydef.position.set(0.0f, (float) (0.2 * Main.width));
-		gndBody = world.createBody(gndBodydef);
-		gndBox = new PolygonShape();
-		gndBox.setAsBox(10.0f, (float) Main.width);
-		gndBody.createFixture(gndBox, 0.0f);
+//		gndBodydef = new BodyDef();
+//		gndBodydef.position.set(0.0f, (float) (0.2 * Main.width));
+//		gndBody = world.createBody(gndBodydef);
+//		gndBox = new PolygonShape();
+//		gndBox.setAsBox(10.0f, (float) Main.width);
+//		gndBody.createFixture(gndBox, 0.0f);
 		playerBodyDef = new BodyDef();
 		playerBodyDef.type = BodyType.DYNAMIC;
 		playerBodyDef.position.x = (float) Main.width / 2;
-		playerBodyDef.position.y = (float) this.player.getCoords().getY();
+		playerBodyDef.position.y = ySlick2Physics(Player.INIT_Y);
 		playerBody = world.createBody(playerBodyDef);
 		playerShape = new PolygonShape();
-		playerShape.setAsBox(this.player.getWidth() / 2, this.player.getHeight() / 2);
+		playerShape.setAsBox(Player.WIDTH / 2, Player.HEIGHT / 2);
 		playerFD = new FixtureDef();
 		playerFD.shape = playerShape;
 		playerFD.density = 1.0f;
@@ -232,17 +234,18 @@ public class GamePlay extends BasicGameState {
 		timeStep = 1.0f / 60.0f;
 		velocityIterations = 6;
 		positionIterations = 2;
-		for (int i = 0; i < 50; i++) {
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(10.0f, 10.0f);
-			gndBody.createFixture(shape, 1.0f);
-		}
+//		for (int i = 0; i < 50; i++) {
+//			PolygonShape shape = new PolygonShape();
+//			shape.setAsBox(10.0f, 10.0f);
+//			gndBody.createFixture(shape, 1.0f);
+//		}
+	}
+	
+	public float ySlick2Physics(float y) {
+		return Main.height - y;
 	}
 
 	private void updatePhysics() {
 		world.step(timeStep, velocityIterations, positionIterations);
-		this.player.setY(playerBody.getPosition().y);
-		this.player.setX(playerBody.getPosition().x);
-
 	}
 }
