@@ -62,6 +62,8 @@ public class GamePlay extends BasicGameState {
 	private int HEARTBEAT_THRESHOLD_MEDIUM = 90;// quite excited
 	private int HEARTBEAT_THRESHOLD_HARD = 120;// runner
 	private int heartBeatsSinceLastUpdate = 0;
+	protected static final float PIXELS_TO_METERS_RATIO = 10.0f;
+	static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
 	
 
 	GamePlay(int stateID) {
@@ -114,7 +116,7 @@ public class GamePlay extends BasicGameState {
 		updatePhysics();
 		updateObjects();
 
-		this.levelManager.update(this.playerBody.getLinearVelocity().x);
+		this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
 		manageColisions();
 	}
@@ -201,7 +203,7 @@ public class GamePlay extends BasicGameState {
 	private void addObjects() throws SlickException {
 		if (totalDistance > nextDistancePopObstacle) {
 			Obstacle o = Obstacle.getRandomObstacle();
-			o.setCoords(Main.width + 300 - (totalDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
+			o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - (totalDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
 			this.objects.add(o);
 			nextDistancePopObstacle += deltaDistancePopObstacle;
 		}
@@ -253,6 +255,24 @@ public class GamePlay extends BasicGameState {
 	private void updatePhysics() {
 		world.step(timeStep, velocityIterations, positionIterations);
 	}
+	
+	/**
+	 * Pixels to Meters converter
+	 * @param px
+	 * @return 
+	 */
+	public static float px2m(int px) {
+		return px / PIXELS_TO_METERS_RATIO;
+	}
+	
+	/**
+	 * Meters to pixels converter
+	 * @param m
+	 * @return 
+	 */
+	public static int m2px(float m) {
+		return (int) (m * PIXELS_TO_METERS_RATIO);
+	}
 
 	private double heartBeatAvgInterval = 2.0; // In seconds
 	private int heartBeatTimer = 0; // in "delta" units
@@ -262,7 +282,7 @@ public class GamePlay extends BasicGameState {
 			// Computing average:
 			currentHeartBeat = (int) (heartBeatsSinceLastUpdate / heartBeatAvgInterval * 60.0);//Average on {heartBeatAvgInterval} seconds, that we put on a 60seconds basis
 			// Resetting values:
-			heartBeatTimer -= heartBeatAvgInterval;
+			heartBeatTimer -= heartBeatAvgInterval*1000;
 			heartBeatsSinceLastUpdate = 0;
 		}
 		
