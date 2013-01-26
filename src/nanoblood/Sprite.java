@@ -60,4 +60,6 @@ public abstract class Sprite {
     public void setCoords(int x, int y) {
         this.coords.setLocation(x, y);
     }
+
+
 }

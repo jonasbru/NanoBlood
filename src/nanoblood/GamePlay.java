@@ -21,6 +21,7 @@ public class GamePlay extends BasicGameState {
 
     int stateID = -1;
     Player player;
+    LevelManager levelManager;
     List<StaticObject> objects;
     double bloodSpeed = 0;
     final int bloodSpeedImpulse = 5;
@@ -38,6 +39,7 @@ public class GamePlay extends BasicGameState {
     @Override
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         this.player = new Player();
+        this.levelManager = new LevelManager();
         this.objects = new ArrayList<StaticObject>();
 
         for (int i = 0; i < 200; i++) {
@@ -49,18 +51,22 @@ public class GamePlay extends BasicGameState {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
-        this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
-
+        this.levelManager.render(gc, sbg, grphcs);
 
         for (StaticObject so : this.objects) {
             so.getRenderable().draw((float) so.coords.getX(),(float) so.coords.getY());
         }
+
+        this.player.getRenderable().draw(Main.width / 2, (float) this.player.getCoords().getY());
     }
 
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
         manageInput(gc, sbg, i);
+        
         updateObjects();
+
+        this.levelManager.update(this.bloodSpeed);
     }
 
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
@@ -82,8 +88,6 @@ public class GamePlay extends BasicGameState {
                 this.bloodSpeed = 0;
             }
         }
-        
-        System.out.println("plop " + bloodSpeed);
     }
 
     private void updateObjects() {
