@@ -85,7 +85,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         player.setCoords(200, Main.height / 2);
 
         for (int i = 0; i < 6; i++) {
-            Obstacle o = new Obstacle();
+            Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
             this.objects.add(o);
         }
@@ -100,6 +100,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
+        this.player.getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
         
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
@@ -169,7 +170,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         List<StaticObject> toRemove = new ArrayList<StaticObject>();
 
         for (StaticObject so : this.objects) {
-            so.move((int) -this.bloodSpeed, 0);
+            so.move((int) -this.bloodSpeed / 3, 0);
             if (so.coords.getX() < -50) {
                 toRemove.add(so);
             }
@@ -210,7 +211,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void addObjects() throws SlickException {
         if(totalDistance > nextDistancePopObstacle) {
-            Obstacle o = new Obstacle();
+            Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(Main.width + 300 - (totalDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
             this.objects.add(o);
             nextDistancePopObstacle += deltaDistancePopObstacle;

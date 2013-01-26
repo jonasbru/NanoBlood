@@ -21,15 +21,22 @@ public class Player extends Sprite {
         STATIC, UP_GO, UP_BACK, DOWN_GO, DOWN_BACK
     }
     Anim currentAnim;
+
     Image staticShip;
+
     Animation downGo;
     Animation downBack;
     Animation upGo;
     Animation upBack;
+
+    Image canons;
+
     final int VERTICAL_SPEED = 8;
 
     public Player() throws SlickException {
         this.staticShip = Sprite.getImage("sprites/player/static.png");
+        this.canons = Sprite.getImage("sprites/player/canons.png");
+        this.canons.rotate(90);
 
         this.boundingBox = new Rectangle(43, 13, 42, 43);
 
@@ -131,5 +138,9 @@ public class Player extends Sprite {
 //        this.up.stop();
 //
 //        currentAnim = Anim.STATIC;
+    }
+
+    public Image getCanons() {
+        return this.canons;
     }
 }
