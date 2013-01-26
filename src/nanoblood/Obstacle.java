@@ -5,45 +5,27 @@
 
 package nanoblood;
 
-import org.newdawn.slick.Animation;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Circle;
 
 /**
  *
  * @author jonas
  */
-public class Obstacle extends StaticObject {
-    private enum Anim {
-        STATIC
-    }
-    Anim currentAnim;
-    
-    Animation staticA;
+public abstract class Obstacle extends StaticObject {
 
-    public Obstacle() throws SlickException {
-
-        this.boundingBox = new Circle((int) this.coords.getX() + 30, (int) this.coords.getX() + 30, 30); //TODO changer
-        
-        Image anim[] = new Image[20];
-        for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/obstacles/coffee/coffe" + Sprite.intToString(i, 5) + ".png");
+    public static Obstacle getRandomObstacle() throws SlickException {
+        int rand = (int) (Math.random() * 5);
+        if(rand < 1) {
+            return new Cancer();
         }
-        this.staticA = new Animation(anim, 50, true);
-
-        this.currentAnim = Anim.STATIC;
-    }
-
-    @Override
-    public Renderable getRenderable() {
-        switch (this.currentAnim) {
-            case STATIC:
-                return this.staticA;
+        if(rand < 2) {
+            return new GlobuleBlanc();
+        }
+        if(rand < 3) {
+            return new Virus();
         }
 
-        return this.staticA;
+        return new GlobuleRouge();
     }
 
     @Override
