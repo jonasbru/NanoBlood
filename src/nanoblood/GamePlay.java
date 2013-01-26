@@ -66,7 +66,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private World world;
     int totalDistance = 0;
     int nextDistancePopObstacle;
-    int deltaDistancePopObstacle = 200;
+    int deltaDistancePopObstacle = 200;// distance between every obstacle spawn
 
     private Vec2 speedImpulse;
     private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
@@ -133,7 +133,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.notifyObservers();
 
         nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 1; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
             this.objects.add(PhysicsObject.createFromCircSprite(o, world));
@@ -224,7 +224,6 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
-
         }
         
         // Update HB display
@@ -254,21 +253,14 @@ public class GamePlay extends BasicGameState implements IObservable {
         List<PhysicsObject> toRemove = new ArrayList<PhysicsObject>();
 
         for (PhysicsObject so : this.objects) {
-            so.move((int) (-1.0f * this.playerBody.getLinearVelocity().x / 3.0f), 0);
+            so.move(new Vec2(1.0f, 0.0f));
 
             if (so.getSprite() instanceof Cancer) {
-                float deltaX = (float) (m2px(playerBody.getPosition().x) - so.getCoords().getX());
-                float deltaY = (float) (ySlick2Physics(m2px(playerBody.getPosition().y)) - so.getCoords().getY());
-
-//                Vector2f v = new Vector2f(deltaX, deltaY);
-                
                 Vec2 v = player.getCoordsVec().sub(so.getCoordsVec());
-//                v = v.normalise();
+                System.out.println(v);
                 v.normalize();
 
                 so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
-
-//                            System.out.println(so.coords + "    " + playerBody.getPosition());
             }
 
             if (so.getCoords().getX() < -50) {
