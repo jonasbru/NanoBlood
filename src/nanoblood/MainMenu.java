@@ -27,10 +27,11 @@ public class MainMenu extends BasicGameState implements ComponentListener {
     Image bg;
 	private MouseOverArea soundCurrent, soundOn, soundOff;
 	protected static boolean SOUND_ON = true;
-	private MouseOverArea play;
+	private MouseOverArea play, tuto;
 	private Image soundOffImg;
 	private Image soundOnImg;
 	private GameContainer lastgc;
+	private StateBasedGame lastsbg;
    
 
     MainMenu(int stateID) {
@@ -51,16 +52,20 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 		soundCurrent = soundOn;//By default, sound is activated
 		play = new MouseOverArea(gc, Sprite.getImage("sprites/play.png"), (int)(0.3 * Main.width), (int)(0.3*Main.height), this);
 		play.setMouseOverImage(Sprite.getImage("sprites/play_mouseover.png"));
+		tuto = new MouseOverArea(gc, Sprite.getImage("sprites/tuto.png"), (int)(0.3 * Main.width), (int)(0.5*Main.height), this);
+		tuto.setMouseOverImage(Sprite.getImage("sprites/tuto_mouseover.png"));
     }
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
         bg.draw(0, 0);
         soundCurrent.render(gc, grphcs);
 		play.render(gc, grphcs);
+		tuto.render(lastgc, grphcs);
     }
 
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {
 		this.lastgc = gc;
+		this.lastsbg = sbg;
     }
 
 	public void componentActivated(AbstractComponent source) {
@@ -72,6 +77,10 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 				SOUND_ON = true;
 				soundCurrent = soundOn;
 			}
+		} else if(play == source) {// if "Play" button is clicked
+			this.lastsbg.enterState(1);//go to GamePlay state
+		} else if(tuto == source) {
+			this.lastsbg.enterState(3);
 		}
 	}
 
