@@ -368,7 +368,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 //		gndBody.createFixture(gndBox, 0.0f);
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DYNAMIC;
-        playerBodyDef.position.x = px2m(Main.width / 2);
+        playerBodyDef.position.x = px2m(Main.PLAYER_X);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
         playerShape = new PolygonShape();
@@ -502,7 +502,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         notifyObserver(scoreDisplay);
     }
 
-      private void spawnRandomObject() throws SlickException {
+    private void spawnRandomObject() throws SlickException {
         Obstacle o = Obstacle.getRandomObstacle();
         o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - ((int) scrolledDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
         PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
