@@ -246,9 +246,10 @@ public class GamePlay extends BasicGameState implements IObservable {
             player.getSprite().setCoords((int)player.getSprite().getCoords().getX(), Main.height);
         }
 
+        // Gameover
         if (life <= 0) {
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
-            
+            GameParams.INSTANCE.setLastScore(score);
             this.lastSbg.enterState(Main.GAMEOVER);
         }
     }

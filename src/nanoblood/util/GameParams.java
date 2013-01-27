@@ -17,7 +17,10 @@ public enum GameParams {
     
     INSTANCE;
     
-    private Properties prop;   
+    private Properties prop;
+    
+    private int lastScore;
+    private int maxScore;
     
     private GameParams() {
         prop = new Properties();
@@ -99,6 +102,14 @@ public enum GameParams {
     // TODO damages
     
     // TODO Maps
+    
+    public void setLastScore(int score) {
+        lastScore = score;
+    }
+    
+    public int getLastScore() {
+        return lastScore;
+    }
     
     
 }
