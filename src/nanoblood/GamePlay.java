@@ -258,6 +258,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         if (life <= 0) {
+            SoundManager.INSTANCE.stopSound(SoundID.MENU);
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
             GameParams.INSTANCE.setLastScore(score);
             this.lastSbg.enterState(Main.GAMEOVER);
@@ -297,12 +298,12 @@ public class GamePlay extends BasicGameState implements IObservable {
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
             
-            SoundManager.INSTANCE.playAsSoundEffect(SoundID.HEARTBEAT, 1f, 4f, false);
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.HEARTBEAT, 1f, 15f, false);
         }
 
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON) || input.isKeyPressed(Input.KEY_RIGHT) || input.isKeyPressed(Input.KEY_LCONTROL)) {
             Laser l = new Laser();
-            SoundManager.INSTANCE.playAsSoundEffect(SoundID.LASER1, 1f, 0.2f, false);
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.LASER1, 1f, 0.1f, false);
             if(laserTop) {
                 l.setCoords((int) player.getCoords().getX() + (int) scrolledDistance * 10, (int) player.getCoords().getY() - 27);
             } else {

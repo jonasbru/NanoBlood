@@ -41,15 +41,15 @@ public class Splash extends Obstacle {
         switch(splashID) {
             default:
             case 0:
-                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH1, 1f, 0.2f, false);
+                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH1, 1f, 0.1f, false);
                 break;
                 
             case 1:
-                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH2, 1f, 0.2f, false);
+                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH2, 1f, 0.1f, false);
                 break;
                 
             case 2:
-                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH3, 1f, 0.2f, false);
+                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH3, 1f, 0.1f, false);
                 break;
         }
         

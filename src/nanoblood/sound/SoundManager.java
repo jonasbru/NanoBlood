@@ -43,7 +43,6 @@ public enum SoundManager {
         // Load all sounds
         try {
             audioBonus = ss.getOgg("sounds/bonus1.ogg");
-            //audioHeartBeat = ss.getOgg("sounds/heartbeat1.ogg");
             audioHeartBeat = ss.getWAV("sounds/coeur_1.wav");
             audioMenu = ss.getOgg("sounds/mainmenu.ogg");
             audioPlay = ss.getOgg("sounds/play.ogg");
