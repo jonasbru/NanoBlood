@@ -56,7 +56,7 @@ public class GameOver extends BasicGameState {
         Input input = gc.getInput();
         if (input.isKeyDown(Input.KEY_ESCAPE)) {
             //this.lastsbg.enterState(Main.MAINMENU);
-            System.exit(0);
-        }
+            System.exit(0); 
+       }
     }    
 }
