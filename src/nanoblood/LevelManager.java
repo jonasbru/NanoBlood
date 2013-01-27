@@ -5,6 +5,7 @@
 package nanoblood;
 
 import java.awt.geom.Point2D;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.GameContainer;
@@ -35,9 +36,10 @@ public class LevelManager {
     // TODO black FX layer + functions (alpha)
     private Image blackFxImage;
     // TODO speed FX layer + functions (alpha)
+    private final World w;
 
-    public LevelManager() throws SlickException {
-        
+    public LevelManager(World w) throws SlickException, FileNotFoundException {
+        this.w = w;
         // Load 2 segments, because of offset
         segmentsStack = new LinkedList<LevelSegment>();
         segmentsStack.add(selectNextSegment());
@@ -46,7 +48,7 @@ public class LevelManager {
         segmentsStack.add(newSegment);
         
         bgStack = new LinkedList<LevelSegment>();
-        bgStack.add(new LevelSegment(BG_IMAGE, false));
+        bgStack.add(new LevelSegment(BG_IMAGE, false, w));
         
         lightning = Sprite.getImage("sprites/fx/Lightning.png");
         
@@ -54,7 +56,7 @@ public class LevelManager {
         blackFxImage.setAlpha(0.0f);
     }
  
-    public void update(double deltaPixels, World w) throws SlickException {
+    public void update(double deltaPixels) throws SlickException, FileNotFoundException {
 
         if (deltaPixels <= 0) {
             return;
@@ -91,7 +93,7 @@ public class LevelManager {
 
             if (headX <= 0 && bgStack.size() < 2) {
                 // Head segment is starting to go out of screen load another one
-                LevelSegment newSegment = new LevelSegment(BG_IMAGE, false);
+                LevelSegment newSegment = new LevelSegment(BG_IMAGE, false, w);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * bgStack.size() + headX), 0));
                 bgStack.add(newSegment);
                 
@@ -125,13 +127,13 @@ public class LevelManager {
         lightning.draw(0, 0, Main.width, Main.height);
     }
 
-    private LevelSegment selectNextSegment() throws SlickException {
+    private LevelSegment selectNextSegment() throws SlickException, FileNotFoundException {
         int segmentId = SEGMENT_IDS[(int) (Math.floor(Math.random() * SEGMENT_IDS.length))];
         
         // Flip desactivé
         boolean isFlippedHorizontally = false;//Math.random() > 0.5 ? true : false;     
         
-        return new LevelSegment("sprites/map/MAP_" + segmentId + ".png", isFlippedHorizontally);
+        return new LevelSegment("sprites/map/MAP_" + segmentId + ".png", isFlippedHorizontally, w);
     }
     
     public void setBlackFxAlpha(float alpha) {

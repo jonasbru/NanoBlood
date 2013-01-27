@@ -5,10 +5,13 @@
 package nanoblood;
 
 import java.awt.geom.Point2D;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -119,7 +122,11 @@ public class GamePlay extends BasicGameState implements IObservable {
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         initPhysics();
         this.player = new PhysicsObject(new Player(), playerBody);
-        this.levelManager = new LevelManager();
+        try {
+            this.levelManager = new LevelManager(this.world);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GamePlay.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.objects = new ArrayList<PhysicsObject>();
         
         this.objects = new ArrayList<PhysicsObject>();
@@ -197,8 +204,12 @@ public class GamePlay extends BasicGameState implements IObservable {
         updateCurrentHB(delta);
         updatePhysics();
         updateObjects();
-
-        this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x), world);
+        
+        try {
+            this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GamePlay.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         manageColisions();
         
