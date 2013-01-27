@@ -22,8 +22,8 @@ public class LevelSegment extends Sprite {
         this.coords = new Point2D.Double(0, 0);
         this.isHorizontallyFlipped = isFlipped;
         this.segmentImage = Sprite.getImage(imagePath);
-        if (null != w) {// if null is passed, then it means we are not concerned about collisions
-            this.cc = CollisionsCollection.fromFile(imagePath.replace(".png", ".map"), 1.0f);
+          if (null != w) {// if null is passed, then it means we are not concerned about collisions
+            this.cc = CollisionsCollection.fromFile(imagePath.replace(".png", ".map"), 10.0f);
         }
     }
     

@@ -39,18 +39,27 @@ public class LevelManager {
     // TODO speed FX layer + functions (alpha)
     private final World w;
     private float scrolledDistance;
+    static private int foregroundLoadingCounter = 0;
+    
+    static public int getForegroundLoadingCounter() {
+        return LevelManager.foregroundLoadingCounter;
+    }
 
+    private void pushNewSegmentsStack(LevelSegment s) {
+        segmentsStack.add(s);
+        collisionsToSegment(s);
+        foregroundLoadingCounter++;
+    }
+    
     public LevelManager(World w) throws SlickException, FileNotFoundException {
         this.w = w;
         // Load 2 segments, because of offset
         segmentsStack = new LinkedList<LevelSegment>();
         LevelSegment initSegment = new LevelSegment("sprites/map/MAP_" + 1 /* specific segmentId */ + ".png", false, w);
-        collisionsToSegment(initSegment);
-        segmentsStack.add(initSegment);
+        pushNewSegmentsStack(initSegment);
         LevelSegment newSegment = selectNextSegment();
-        collisionsToSegment(newSegment);
         newSegment.setCoords(new Point2D.Float((float)(Main.width - SEGMENT_X_OFFSET), 0f));
-        segmentsStack.add(newSegment);
+        pushNewSegmentsStack(newSegment);
         
         bgStack = new LinkedList<LevelSegment>();
         bgStack.add(new LevelSegment(BG_IMAGE, false, w));
@@ -81,8 +90,7 @@ public class LevelManager {
                 LevelSegment newSegment = selectNextSegment();
                 collisionsToSegment(newSegment);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * segmentsStack.size() + headTopLeftX - 2* SEGMENT_X_OFFSET), 0));
-                segmentsStack.add(newSegment);
-                
+                pushNewSegmentsStack(newSegment);
             } else if (headTopLeftX <= -Main.width - SEGMENT_X_OFFSET) {
                 // Head segment is out of screen, remove it
                 headSegment.goodBye(w);

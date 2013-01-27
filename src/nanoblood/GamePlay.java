@@ -21,6 +21,8 @@ import nanoblood.ui.ScoreDisplay;
 import nanoblood.util.GameParams;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -86,7 +88,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int heartBeatsSinceLastUpdate = 0;
     protected static final float PIXELS_TO_METERS_RATIO = 10.0f;
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
-    private static boolean DBG = true;
+    private static boolean DBG = false;
     private LinkedList<Long> HBList = new LinkedList<Long>();
     
     int score;
@@ -362,15 +364,16 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     private void initPhysics() {
-        gravity = new Vec2(0.0f, 0.0f);
+        gravity = new Vec2(0.0f, 0.0f);//debug
         world = new World(gravity, true);
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DYNAMIC;
         playerBodyDef.position.x = px2m(Main.PLAYER_X);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
-        playerShape = new PolygonShape();
-        playerShape.setAsBox(px2m(Player.WIDTH / 2), px2m(Player.HEIGHT / 2));
+        CircleShape playerShape = new CircleShape();
+        playerShape.m_radius = 10.0f;
+        playerShape.m_type = ShapeType.CIRCLE;
         playerFD = new FixtureDef();
         playerFD.shape = playerShape;
         playerFD.density = 1.0f;
@@ -379,6 +382,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBody.setAngularDamping(200);
         playerBody.setLinearDamping(1.2f);
         playerBody.createFixture(playerFD);
+        
         timeStep = 1.0f / 60.0f;
         velocityIterations = 6;
         positionIterations = 2;
@@ -397,6 +401,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         world.step(timeStep, velocityIterations, positionIterations);
         scrollDelta = player.getPhyCoordsVec().x - currPos.x;
         scrolledDistance += scrollDelta;
+        System.out.println("Player=" + player.getPhyCoordsVec() + "\t" + player.getCoords());
         if (DBG) {
             System.out.println("Scrolled=" + scrolledDistance);
         }
