@@ -4,6 +4,8 @@
  */
 package nanoblood;
 
+import nanoblood.sound.SoundID;
+import nanoblood.sound.SoundManager;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
@@ -33,6 +35,7 @@ public class Splash extends Obstacle {
         }
         this.staticA = new Animation(anim, 30, true);
         staticA.setLooping(false);
+        SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH, false);
 
         this.currentAnim = Anim.STATIC;
     }

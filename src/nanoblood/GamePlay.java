@@ -474,7 +474,14 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     public void addLife(int dLife) {
-        life = life + dLife < 0 ? 0 : life + dLife;
+        life += dLife;
+        if (life < 0) {
+            life = 0;
+        }
+        else if (life > GameParams.INSTANCE.MaxLife()) {
+            life = GameParams.INSTANCE.MaxLife();
+        }
+        
         setChanged();
         notifyObserver(lifeDisplay);
     }
