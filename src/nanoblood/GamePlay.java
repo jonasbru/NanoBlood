@@ -202,10 +202,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
         removeObjects();
         addObjects();
-        System.out.println("size : " + this.objects.size());
-        if (this.objects.size() > 0) {
-            System.out.println("size : " + this.objects.size() + "  " + this.objects.get(this.objects.size() - 1).getCoords());
-        }
+
         manageInput(gc, sbg, delta);
 
         updateCurrentHB(delta);
@@ -284,9 +281,14 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
             Laser l = new Laser();
-            l.setCoords(player.getCoords());
+            l.setCoords((int)player.getCoords().getX() + (int)scrolledDistance*10, (int)player.getCoords().getY());
+            //lasers.add(l);
 
-            lasers.add(l);
+            PhysicsObject phyObj = PhysicsObject.createFromCircSprite(l, world);
+
+            phyObj.move(1500, 0);
+
+            objects.add(phyObj);
         }
 
         // Update HB display
@@ -326,9 +328,9 @@ public class GamePlay extends BasicGameState implements IObservable {
                 so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
             }
 
-//            if (so.getPhyCoordsVec().x < -50) {
-//                toRemove.add(so);
-//            }
+            if (so.getCoords().getX() < -250) {
+                toRemove.add(so);
+            }
         }
 
         for (PhysicsObject so : toRemove) {
@@ -506,7 +508,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void spawnRandomObject() throws SlickException {
         Obstacle o = Obstacle.getRandomObstacle();
-             o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY + m2px(scrolledDistance), (int) (Math.random() * Main.height));
+            o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY + m2px(scrolledDistance), (int) (Math.random() * Main.height));
 //        o.setCoords(4000, (int) (Math.random() * Main.height));
         PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
         //phyObj.move(3.0f, 0.0f);
