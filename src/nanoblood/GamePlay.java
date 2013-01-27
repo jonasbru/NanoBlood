@@ -410,9 +410,11 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBodyDef.position.x = px2m(Main.PLAYER_X);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
-        CircleShape playerShape = new CircleShape();
-        playerShape.m_radius = 10.0f;
-        playerShape.m_type = ShapeType.CIRCLE;
+//        playerShape = new CircleShape();
+        playerShape = new PolygonShape();
+        playerShape.setAsBox(px2m(Player.WIDTH/2), px2m(Player.HEIGHT/2));
+//        playerShape.m_radius = 1.0f;
+//        playerShape.m_type = ShapeType.CIRCLE;
         playerFD = new FixtureDef();
         playerFD.shape = playerShape;
         playerFD.density = 1.0f;
