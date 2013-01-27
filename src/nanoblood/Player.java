@@ -19,8 +19,8 @@ import org.newdawn.slick.geom.Circle;
  */
 public class Player extends Sprite {
 
-    static final protected Vec2 upImpulseVec = new Vec2(0.0f, 5000.0f);
-    static final protected Vec2 downImpulseVec = new Vec2(0.0f, -5000.0f);
+    static final protected Vec2 upImpulseVec = new Vec2(0.0f, 70.0f);
+    static final protected Vec2 downImpulseVec = new Vec2(0.0f, -70.0f);
     protected static final float INIT_X = Main.PLAYER_X;
     protected static final float WIDTH = 42;
     protected static final float INIT_Y = Main.height / 2 - WIDTH / 2;

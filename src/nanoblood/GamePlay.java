@@ -56,10 +56,10 @@ public class GamePlay extends BasicGameState implements IObservable {
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 1;
     final double bloodSpeedDecrease = 0.01;
-    static public final int IMPULSE_COEFF_SLOW = 3;
-    static public final int IMPULSE_COEFF_MEDIUM = 6;
-    static public final int IMPULSE_COEFF_HARD = 6; //20 avant
-    static public final int IMPULSE_COEFF_CRAZY = 6; //30 avant
+    static public final int IMPULSE_COEFF_SLOW = 6;
+    static public final int IMPULSE_COEFF_MEDIUM = 8;
+    static public final int IMPULSE_COEFF_HARD = 9; //20 avant
+    static public final int IMPULSE_COEFF_CRAZY = 9; //30 avant
     private Vec2 gravity;
 //	private BodyDef gndBodydef;
 //	private Body gndBody;
@@ -352,7 +352,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void addObjects() throws SlickException {
         if (scrolledDistance > nextDistancePopObstacle) {
-            spawnRandomObject();
+                spawnRandomObject();
             nextDistancePopObstacle += deltaDistancePopObstacle;
         }
     }
