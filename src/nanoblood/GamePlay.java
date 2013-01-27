@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import nanoblood.sound.SoundID;
+import nanoblood.sound.SoundManager;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -25,6 +27,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -102,7 +105,11 @@ public class GamePlay extends BasicGameState implements IObservable {
     private StateBasedGame lastSbg;
     long lastTick;
     long elapsedTime;
+    
     boolean laserTop = true;
+    
+    // Sounds
+    private Sound hbSound;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -232,6 +239,8 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         if (life <= 0) {
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
+            
             this.lastSbg.enterState(Main.GAMEOVER);
         }
 
@@ -273,6 +282,8 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
+            
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.HEARTBEAT, false);
         }
 
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
@@ -533,6 +544,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     public void addScore(int dScore) {
+        System.out.println("Score: " + score);
         score += score;
         setChanged();
         notifyObserver(scoreDisplay);
