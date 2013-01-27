@@ -54,7 +54,7 @@ public class GlobuleRouge extends Obstacle {
 
     @Override
     public void colideWithPlayer() {
-        this.remove = true;
+        die();
         
         if (!((Player)GamePlay.getGP().player.getSprite()).isShieldActivated()) {
             GamePlay.getGP().life -= 10;

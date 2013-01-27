@@ -19,10 +19,10 @@ public class Main extends StateBasedGame{
 
     public static final int height = 720;
     public static final int width = 1280;
-    public static final int PLAYER_X = Main.width / 10;
     public static final boolean fullscreen = false;
     public static final boolean showFPS = true;
     public static final String title = "NanoBlood";
+    public static final int PLAYER_X = Main.width / 10;
     public static final int fpslimit = 60;
     public static final int MAINMENU = 0;
     public static final int GAMEPLAY = 1;

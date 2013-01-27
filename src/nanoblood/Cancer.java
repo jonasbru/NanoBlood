@@ -4,6 +4,8 @@
  */
 package nanoblood;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
@@ -49,9 +51,9 @@ public class Cancer extends Obstacle {
 
     @Override
     public void colideWithPlayer() {
-        this.remove = true;
+        die();
 
-        if (!((Player)GamePlay.getGP().player.getSprite()).isShieldActivated()) {
+        if (!((Player) GamePlay.getGP().player.getSprite()).isShieldActivated()) {
 
             GamePlay.getGP().life -= 50;
 

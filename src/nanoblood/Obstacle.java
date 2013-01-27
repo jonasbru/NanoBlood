@@ -5,6 +5,8 @@
 
 package nanoblood;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.newdawn.slick.SlickException;
 
 /**
@@ -40,6 +42,22 @@ public abstract class Obstacle extends StaticObject {
     @Override
     public void colideWithPlayer() {
         this.remove = true;
+    }
+
+    public void die() {
+        this.remove = true;
+
+        Splash s = null;
+        try {
+            s = new Splash();
+        } catch (SlickException ex) {
+            Logger.getLogger(Cancer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        s.setCoords(this.coords);
+
+        s.staticA.start();
+
+        GamePlay.getGP().splashes.add(s);
     }
 
 

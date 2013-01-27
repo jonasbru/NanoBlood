@@ -52,6 +52,8 @@ public class LevelManager {
         
         lightning = Sprite.getImage("sprites/fx/Lightning.png");
         
+        lightning = Sprite.getImage("sprites/fx/Lightning.png");
+        
         blackFxImage = Sprite.getImage("sprites/fx/BlackFX.png");
         blackFxImage.setAlpha(0.0f);
     }
