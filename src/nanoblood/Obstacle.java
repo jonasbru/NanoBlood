@@ -16,24 +16,24 @@ import org.newdawn.slick.SlickException;
 public abstract class Obstacle extends StaticObject {
 
     public static Obstacle getRandomObstacle() throws SlickException {
-        int rand = (int) (Math.random() * 14);
+        int rand = (int) (Math.random() * 30);
         if(rand < 1) {
             return new Cancer();
         }
-        if(rand < 3) {
+        if(rand < 2) {
             return new Virus();
         }
-        if(rand < 5) {
+        if(rand < 3) {
             return new GlobuleBlanc();
         }
-        if(rand < 10) {
-            return new GlobuleRouge();
+        if(rand < 4) {
+            return new Heart();
         }
-        if(rand < 12) {
+        if(rand < 5) {
             return new Bouclier();
         }
-        if(rand < 14) {
-            return new Heart();
+        if(rand < 30) {
+            return new GlobuleRouge();
         }
 
         return null;
@@ -53,11 +53,14 @@ public abstract class Obstacle extends StaticObject {
         } catch (SlickException ex) {
             Logger.getLogger(Cancer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        s.setCoords(this.coords);
+        s.setCoords((int)this.coords.getX() - 20, (int)this.coords.getY() - 20);
 
         s.staticA.start();
 
-        GamePlay.getGP().splashes.add(s);
+//        GamePlay.getGP().splashes.add(s);
+
+        PhysicsObject phyObj = PhysicsObject.createFromCircSprite(s, GamePlay.getGP().world);
+        GamePlay.getGP().objects.add(phyObj);
     }
 
 

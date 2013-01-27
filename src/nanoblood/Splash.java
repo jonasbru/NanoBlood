@@ -4,6 +4,8 @@
  */
 package nanoblood;
 
+import nanoblood.sound.SoundID;
+import nanoblood.sound.SoundManager;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
@@ -25,14 +27,15 @@ public class Splash extends Obstacle {
 
     public Splash() throws SlickException {
 
-        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getY() + 50, 35);
+        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getY() + 50, 1);
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {
             anim[i] = Sprite.getImage("sprites/splashseq/splashbrut" + Sprite.intToString(i, 4) + ".png");
         }
-        this.staticA = new Animation(anim, 100, true);
+        this.staticA = new Animation(anim, 30, true);
         staticA.setLooping(false);
+        SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH, false);
 
         this.currentAnim = Anim.STATIC;
     }

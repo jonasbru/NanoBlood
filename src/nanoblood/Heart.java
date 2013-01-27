@@ -5,6 +5,8 @@
 
 package nanoblood;
 
+import nanoblood.sound.SoundID;
+import nanoblood.sound.SoundManager;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
@@ -50,9 +52,10 @@ private enum Anim {
     public void colideWithPlayer() {
         this.remove = true;
 
-        GamePlay.getGP().life += 50;
+        GamePlay.getGP().life += 20;
 
         GamePlay.getGP().setChanged();
         GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+        SoundManager.INSTANCE.playAsSoundEffect(SoundID.LIFEUP, false);
     }
 }

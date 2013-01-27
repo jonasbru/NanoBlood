@@ -1,4 +1,3 @@
-
 package nanoblood;
 
 import java.io.FileNotFoundException;
@@ -8,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import nanoblood.sound.SoundID;
+import nanoblood.sound.SoundManager;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -27,6 +28,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -51,7 +53,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     PhysicsObject player;
     LevelManager levelManager;
     List<PhysicsObject> objects;
-    List<Laser> lasers;
+    List<PhysicsObject> lasers;
     List<Splash> splashes;
     
     // Déclarer ses valeurs dans un properties
@@ -63,6 +65,9 @@ public class GamePlay extends BasicGameState implements IObservable {
     static public final int IMPULSE_COEFF_HARD = 9; //20 avant
     static public final int IMPULSE_COEFF_CRAZY = 9; //30 avant
     private Vec2 gravity;
+//	private BodyDef gndBodydef;
+//	private Body gndBody;
+//	private PolygonShape gndBox;
     private BodyDef playerBodyDef;
     private Body playerBody;
     private PolygonShape playerShape;
@@ -75,8 +80,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     int totalDistance = 0;
     float scrolledDistance = 0.0f;
     int nextDistancePopObstacle;
-    int deltaDistancePopObstacle = 200;// distance between every obstacle spawn
-    
+    int deltaDistancePopObstacle = 4;// distance between every obstacle spawn
     //Pop obstacles
     private Vec2 speedImpulse;
     private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
@@ -108,6 +112,11 @@ public class GamePlay extends BasicGameState implements IObservable {
     
     long lastTick;
     long elapsedTime;
+    
+    boolean laserTop = true;
+    
+    // Sounds
+    private Sound hbSound;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -129,7 +138,7 @@ public class GamePlay extends BasicGameState implements IObservable {
             Logger.getLogger(GamePlay.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.objects = new ArrayList<PhysicsObject>();
-        this.lasers = new ArrayList<Laser>();
+        this.lasers = new ArrayList<PhysicsObject>();
         this.splashes = new ArrayList<Splash>();
         
         this.objects = new ArrayList<PhysicsObject>();
@@ -166,7 +175,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) throws SlickException {
-        System.out.println("ENTERING !");
+//        System.out.println("ENTERING !");
         //* Pushing data to the HBQueue at the beginning so that the average on the last 10 seconds is not null or very low but is 70 HB
         java.util.Date date = new java.util.Date();
         for (int i = 0; i < ((double) INITIAL_HEARTBEATS / 60.0) * heartBeatAvgInterval + 1; i++) {
@@ -182,20 +191,24 @@ public class GamePlay extends BasicGameState implements IObservable {
         
         this.levelManager.render(gc, sbg, grphcs);
 
-        for(Splash s : splashes) {
-            s.getRenderable().draw((float)s.getCoords().getX(), (float)s.getCoords().getY());
+        for (Splash s : splashes) {
+            s.getRenderable().draw((float) s.getCoords().getX(), (float) s.getCoords().getY());
         }
 
         for (PhysicsObject so : this.objects) {
             so.getRenderable().draw((float) so.getCoords().getX(), (float) so.getCoords().getY());
         }
 
-        this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
-        ((Player)player.getSprite()).getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
-        if(((Player)player.getSprite()).isShieldActivated()) {
-            ((Player)player.getSprite()).shield.draw((float) this.player.getCoords().getX() - 25, (float) this.player.getCoords().getY() - 25);
+        for (PhysicsObject so : this.lasers) {
+            so.getRenderable().draw((float) so.getCoords().getX(), (float) so.getCoords().getY());
         }
-        
+
+        this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
+        ((Player) player.getSprite()).getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
+        if (((Player) player.getSprite()).isShieldActivated()) {
+            ((Player) player.getSprite()).shield.draw((float) this.player.getCoords().getX() - 25, (float) this.player.getCoords().getY() - 25);
+        }
+
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
         this.lifeDisplay.render(gc, sbg, grphcs);
@@ -212,6 +225,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         updateCurrentHB(delta);
         updatePhysics();
         updateObjects();
+        updateLasers();
         updateSplashes();
         try {
             this.levelManager.update(m2px(scrollDelta), m2px(scrolledDistance));
@@ -232,21 +246,17 @@ public class GamePlay extends BasicGameState implements IObservable {
             addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
             
             if (currentHeartBeat < GameParams.INSTANCE.BeatThreshold1()) {
-                addLife(- GameParams.INSTANCE.DamageLowBeat());
-            }
-            else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold4()) {
-                addLife(- GameParams.INSTANCE.DamageHighBeat());
+                addLife(-GameParams.INSTANCE.DamageLowBeat());
+            } else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold4()) {
+                addLife(-GameParams.INSTANCE.DamageHighBeat());
             }
         }
 
         if (life <= 0) {
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
+            
             this.lastSbg.enterState(Main.GAMEOVER);
         }
-
-        // DEBUG score
-        score = (int) bloodSpeed;
-        setChanged();
-        notifyObserver(scoreDisplay);
     }
 
     private float computeImpulseFromHeartBeat(int hb) {
@@ -269,46 +279,43 @@ public class GamePlay extends BasicGameState implements IObservable {
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
         Input input = gc.getInput();
 
-        if (input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_Z)) {
+        if (input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_Z) || input.isKeyDown(Input.KEY_W)) {
             player.moveImpulse(Player.upImpulseVec);
-            ((Player)player.getSprite()).goUp();
+            ((Player) player.getSprite()).goUp();
         } else if (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
             player.moveImpulse(Player.downImpulseVec);
-            ((Player)player.getSprite()).goDown();
+            ((Player) player.getSprite()).goDown();
         } else {
-            ((Player)player.getSprite()).stop();
+            ((Player) player.getSprite()).stop();
         }
 
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
+            
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.HEARTBEAT, false);
         }
 
-        if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON) || input.isKeyPressed(Input.KEY_RIGHT) || input.isKeyPressed(Input.KEY_LCONTROL)) {
             Laser l = new Laser();
-            l.setCoords(player.getCoords());
-            
-            lasers.add(l);
+            if(laserTop) {
+                l.setCoords((int) player.getCoords().getX() + (int) scrolledDistance * 10, (int) player.getCoords().getY() - 27);
+            } else {
+                l.setCoords((int) player.getCoords().getX() + (int) scrolledDistance * 10, (int) player.getCoords().getY() + 24);
+            }
+            laserTop = !laserTop;
+
+            PhysicsObject phyObj = PhysicsObject.createFromCircSprite(l, world);
+
+//            phyObj.moveImpulse(new Vec2(150.0f, 0.0f));
+            //phyObj.getBody().applyLinearImpulse(new Vec2(500, 0.0f), phyObj.getBody().getPosition());
+
+            lasers.add(phyObj);
         }
 
         // Update HB display
         this.setChanged();
         notifyObserver(heartBeatDisplay);
-
-        // DEBUG score
-        if (DBG && input.isKeyPressed(Input.KEY_TAB)) {
-            score += 100;
-            setChanged();
-            notifyObserver(scoreDisplay);
-        }
-
-        // DEBUG life
-        if (DBG && input.isKeyPressed(Input.KEY_A)) {
-            if (life > 0) {
-                life -= 10;
-            }
-            setChanged();
-            notifyObserver(lifeDisplay);
-        }
+        
     }
 
     private void updateObjects() {
@@ -327,7 +334,7 @@ public class GamePlay extends BasicGameState implements IObservable {
                 so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
             }
 
-            if (so.getCoords().getX() < -50) {
+            if (so.getCoords().getX() < -250) {
                 toRemove.add(so);
             }
         }
@@ -339,11 +346,35 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void manageColisions() {
 
-        for (PhysicsObject so : this.objects) {
-            if (this.player.getSprite().boundingBox.intersects(so.getSprite().getBoundingBox())) {
-                so.colideWithPlayer();
+        for (int i = 0; i < this.objects.size(); i++) {
+            if (this.player.getSprite().boundingBox.intersects(objects.get(i).getSprite().getBoundingBox())) {
+                objects.get(i).colideWithPlayer();
             }
         }
+
+        for (int j = 0; j < this.lasers.size();) {
+            boolean stop = false;
+            for (int i = 0; i < this.objects.size();) {
+                stop = false;
+                Sprite s = this.objects.get(i).getSprite();
+                Laser l = (Laser) this.lasers.get(j).getSprite();
+                if (s.boundingBox.intersects(l.getBoundingBox())
+                        && (s instanceof Cancer || s instanceof GlobuleBlanc || s instanceof GlobuleRouge || s instanceof Virus)) {
+                    ((Obstacle) s).die();
+                    objects.remove(i);
+                    lasers.remove(j);
+                    stop = true;
+                    break;
+                } else {
+                    i++;
+                }
+            }
+            if(!stop) {
+                j++;
+            }
+        }
+
+
     }
 
     private void removeObjects() {
@@ -358,13 +389,13 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void addObjects() throws SlickException {
         if (scrolledDistance > nextDistancePopObstacle) {
-                spawnRandomObject();
+            spawnRandomObject();
             nextDistancePopObstacle += deltaDistancePopObstacle;
         }
     }
 
     private void initPhysics() {
-        gravity = new Vec2(0.0f, 0.0f);//debug
+        gravity = new Vec2(0.0f, 0.0f);
         world = new World(gravity, true);
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DYNAMIC;
@@ -430,7 +461,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public static int m2px(float m) {
         return (int) (m * PIXELS_TO_METERS_RATIO);
     }
-    private int heartBeatAvgInterval = 10; // In seconds
+    private int heartBeatAvgInterval = 5; // In seconds
 
     private void updateCurrentHB(int delta) {
         // Computing average:
@@ -461,53 +492,65 @@ public class GamePlay extends BasicGameState implements IObservable {
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
     }
-    
+
     public float getScoreModifier() {
         if (currentHeartBeat <= GameParams.INSTANCE.BeatThreshold1()) {
             return GameParams.INSTANCE.ScoreModifier1();
-        }
-        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold1()
+        } else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold1()
                 && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold2()) {
             return GameParams.INSTANCE.ScoreModifier2();
-        }
-        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold2()
+        } else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold2()
                 && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold3()) {
             return GameParams.INSTANCE.ScoreModifier3();
-        }
-        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold3()
+        } else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold3()
                 && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold4()) {
             return GameParams.INSTANCE.ScoreModifier4();
-        }
-        else {
+        } else {
             return GameParams.INSTANCE.ScoreModifier5();
         }
     }
 
+    private void updateLasers() {
+        for (PhysicsObject po : this.lasers) {
+//            po.getCoords().setLocation(po.getCoords().getX() + 10, po.getCoords().getY());
+//            po.getSprite().coords.setLocation(po.getCoords().getX() + 10, po.getCoords().getY());
+            po.getBody().setTransform(new Vec2((float) po.getBody().getPosition().x + 3, (float) po.getBody().getPosition().y), 0);
+        }
+    }
+
     private void updateSplashes() {
-        for(int i = 0; i < this.splashes.size(); i++) {
-            if(splashes.get(i).staticA.isStopped()) {
+        for (int i = 0; i < this.splashes.size(); i++) {
+            if (splashes.get(i).staticA.isStopped()) {
                 this.splashes.remove(i);
             } else {
                 i++;
             }
         }
     }
-    
+
     public void addLife(int dLife) {
-        life = life + dLife < 0 ? 0 : life + dLife;
+        life += dLife;
+        if (life < 0) {
+            life = 0;
+        }
+        else if (life > GameParams.INSTANCE.MaxLife()) {
+            life = GameParams.INSTANCE.MaxLife();
+        }
+        
         setChanged();
         notifyObserver(lifeDisplay);
     }
-    
+
     public void addScore(int dScore) {
-        score += score;
+        score += dScore;
         setChanged();
         notifyObserver(scoreDisplay);
     }
 
     private void spawnRandomObject() throws SlickException {
         Obstacle o = Obstacle.getRandomObstacle();
-        o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - ((int) scrolledDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
+        o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY + m2px(scrolledDistance), (int) (Math.random() * Main.height));
+//        o.setCoords(4000, (int) (Math.random() * Main.height));
         PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
         //phyObj.move(3.0f, 0.0f);
         this.objects.add(phyObj);
@@ -524,7 +567,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public float getHeartBeat() {
         return bloodSpeed;
     }
-    
+
     public int getCurrentHeartBeat() {
         return currentHeartBeat;
     }
@@ -580,8 +623,8 @@ public class GamePlay extends BasicGameState implements IObservable {
     public void setChanged() {
         hasChanged = true;
     }
-    
+
     static float px2m(double x) {
-        return px2m((int)x);
+        return px2m((int) x);
     }
 }
