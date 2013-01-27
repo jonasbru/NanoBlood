@@ -1,13 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package nanoblood;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nanoblood.sound.SoundID;
 import nanoblood.sound.SoundManager;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -23,6 +22,8 @@ import nanoblood.ui.ScoreDisplay;
 import nanoblood.util.GameParams;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -36,9 +37,8 @@ import org.newdawn.slick.state.StateBasedGame;
  * @author jammers 2013
  */
 public class GamePlay extends BasicGameState implements IObservable {
-
+    
     private static GamePlay gp = null;
-
     public static GamePlay getGP() {
         return gp;
     }
@@ -55,6 +55,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     List<PhysicsObject> objects;
     List<PhysicsObject> lasers;
     List<Splash> splashes;
+    
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 1;
@@ -75,6 +76,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int velocityIterations;
     private int positionIterations;
     World world;
+
     int totalDistance = 0;
     float scrolledDistance = 0.0f;
     int nextDistancePopObstacle;
@@ -90,19 +92,24 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int heartBeatsSinceLastUpdate = 0;
     protected static final float PIXELS_TO_METERS_RATIO = 10.0f;
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
-    private static boolean DBG = true;
+    private static boolean DBG = false;
     private LinkedList<Long> HBList = new LinkedList<Long>();
+    
     int score;
     float life;
+    
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
     HeartBeatDisplay heartBeatDisplay;
+    
     // Observable vars
     private boolean hasChanged;
     private ArrayList<IObserver> observers;
+    
     private GameContainer lastGc;
     private StateBasedGame lastSbg;
+    
     long lastTick;
     long elapsedTime;
     
@@ -125,11 +132,15 @@ public class GamePlay extends BasicGameState implements IObservable {
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         initPhysics();
         this.player = new PhysicsObject(new Player(), playerBody);
-        this.levelManager = new LevelManager();
+        try {
+            this.levelManager = new LevelManager(this.world);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GamePlay.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.objects = new ArrayList<PhysicsObject>();
         this.lasers = new ArrayList<PhysicsObject>();
         this.splashes = new ArrayList<Splash>();
-
+        
         this.objects = new ArrayList<PhysicsObject>();
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
@@ -150,7 +161,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         // Notify for 1st time
         this.setChanged();
         this.notifyObservers();
-
+        
         lastTick = System.currentTimeMillis();
         elapsedTime = 0;
 
@@ -174,10 +185,10 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
-
+        
         this.lastGc = gc;
         this.lastSbg = sbg;
-
+        
         this.levelManager.render(gc, sbg, grphcs);
 
         for (Splash s : splashes) {
@@ -216,18 +227,21 @@ public class GamePlay extends BasicGameState implements IObservable {
         updateObjects();
         updateLasers();
         updateSplashes();
-
-        this.levelManager.update(m2px(scrollDelta));
+        try {
+            this.levelManager.update(m2px(scrollDelta), m2px(scrolledDistance));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GamePlay.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         manageColisions();
-
+        
         // Update score each second
         long currentTime = System.currentTimeMillis();
         elapsedTime = currentTime - lastTick;
         if (elapsedTime >= 1000) {
             elapsedTime -= 1000;
             lastTick = currentTime;
-
+            
             float scoreModifier = getScoreModifier();
             addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
             
@@ -319,7 +333,7 @@ public class GamePlay extends BasicGameState implements IObservable {
             so.move(new Vec2(0.0f, 0.0f));
             if (so.getSprite() instanceof Cancer) {
                 Vec2 v = player.getPhyCoordsVec().sub(so.getPhyCoordsVec());
-
+                
                 v.normalize();
                 if (DBG) {
                     System.out.println("Normalized cancer v-vect=" + v);
@@ -391,19 +405,14 @@ public class GamePlay extends BasicGameState implements IObservable {
     private void initPhysics() {
         gravity = new Vec2(0.0f, 0.0f);
         world = new World(gravity, true);
-//		gndBodydef = new BodyDef();
-//		gndBodydef.position.set(0.0f, (float) (0.2 * Main.width));
-//		gndBody = world.createBody(gndBodydef);
-//		gndBox = new PolygonShape();
-//		gndBox.setAsBox(10.0f, (float) Main.width);
-//		gndBody.createFixture(gndBox, 0.0f);
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DYNAMIC;
         playerBodyDef.position.x = px2m(Main.PLAYER_X);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
-        playerShape = new PolygonShape();
-        playerShape.setAsBox(px2m(Player.WIDTH / 2), px2m(Player.HEIGHT / 2));
+        CircleShape playerShape = new CircleShape();
+        playerShape.m_radius = 10.0f;
+        playerShape.m_type = ShapeType.CIRCLE;
         playerFD = new FixtureDef();
         playerFD.shape = playerShape;
         playerFD.density = 1.0f;
@@ -412,6 +421,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBody.setAngularDamping(200);
         playerBody.setLinearDamping(1.2f);
         playerBody.createFixture(playerFD);
+        
         timeStep = 1.0f / 60.0f;
         velocityIterations = 6;
         positionIterations = 2;
@@ -430,13 +440,14 @@ public class GamePlay extends BasicGameState implements IObservable {
         world.step(timeStep, velocityIterations, positionIterations);
         scrollDelta = player.getPhyCoordsVec().x - currPos.x;
         scrolledDistance += scrollDelta;
+        System.out.println("Player=" + player.getPhyCoordsVec() + "\t" + player.getCoords());
         if (DBG) {
-//            System.out.println("Scrolled=" + scrolledDistance);
+            System.out.println("Scrolled=" + scrolledDistance);
         }
         PhysicsObject.setScrolledDistance(scrolledDistance);
         if (DBG) {
             for (PhysicsObject po : objects) {
-//                System.out.println(po.getPhyCoords() + "\t" + po.getCoords());
+                System.out.println(po.getPhyCoords() + "\t" + po.getCoords());
             }
         }
     }

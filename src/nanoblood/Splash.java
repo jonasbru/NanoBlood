@@ -35,7 +35,24 @@ public class Splash extends Obstacle {
         }
         this.staticA = new Animation(anim, 30, true);
         staticA.setLooping(false);
-        SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH, false);
+        
+        // Random splash sound
+        int splashID = (int) Math.floor(Math.random() * 3);
+        switch(splashID) {
+            default:
+            case 0:
+                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH1, false);
+                break;
+                
+            case 1:
+                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH2, false);
+                break;
+                
+            case 2:
+                SoundManager.INSTANCE.playAsSoundEffect(SoundID.SPLASH3, false);
+                break;
+        }
+        
 
         this.currentAnim = Anim.STATIC;
     }
