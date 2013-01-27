@@ -55,10 +55,7 @@ public class Cancer extends Obstacle {
 
         if (!((Player) GamePlay.getGP().player.getSprite()).isShieldActivated()) {
 
-            GamePlay.getGP().life -= 50;
-
-            GamePlay.getGP().setChanged();
-            GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+            GamePlay.getGP().addLife(-50);
         }
     }
 }

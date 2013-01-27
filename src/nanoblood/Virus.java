@@ -51,10 +51,7 @@ public class Virus extends Obstacle {
         die();
 
         if (!((Player)GamePlay.getGP().player.getSprite()).isShieldActivated()) {
-            GamePlay.getGP().life -= 25;
-
-            GamePlay.getGP().setChanged();
-            GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
+            GamePlay.getGP().addLife(-25);
         }
     }
 }
