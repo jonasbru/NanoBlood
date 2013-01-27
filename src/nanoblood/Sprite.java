@@ -74,7 +74,14 @@ public abstract class Sprite {
         return boundingBox;
     }
 
+    protected boolean remove = false;
 
+    public void colideWithPlayer() {
+        this.remove = true;
+    }
 
+    public boolean needToRemove() {
+        return remove;
+    }
 
 }
