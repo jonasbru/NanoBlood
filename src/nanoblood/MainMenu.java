@@ -9,6 +9,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.MouseOverArea;
@@ -23,6 +24,8 @@ import org.newdawn.slick.state.StateBasedGame;
 public class MainMenu extends BasicGameState implements ComponentListener {
 
     int stateID = -1;
+    
+    private Sound playSound;
 
     Image bg;
 	private MouseOverArea soundCurrent, soundOn, soundOff;
@@ -57,6 +60,8 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 		play.setMouseOverImage(Sprite.getImage("sprites/play_mouseover.png"));
 		tuto = new MouseOverArea(gc, Sprite.getImage("sprites/tuto.png"), 192, 103, this);
 		tuto.setMouseOverImage(Sprite.getImage("sprites/tuto_mouseover.png"));
+                
+        playSound = new Sound("sounds/sfx/play.mp3");
     }
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
@@ -89,6 +94,7 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 				soundCurrent = soundOn;
 			}
 		} else if(play == source) {// if "Play" button is clicked
+                    playSound.play();
 			this.lastsbg.enterState(Main.GAMEPLAY);//go to GamePlay state
 		} else if(tuto == source) {
 			this.lastsbg.enterState(Main.TUTORIAL);
