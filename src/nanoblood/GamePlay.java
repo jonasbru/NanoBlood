@@ -78,7 +78,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     int totalDistance = 0;
     float scrolledDistance = 0.0f;
     int nextDistancePopObstacle;
-    int deltaDistancePopObstacle = 40;// distance between every obstacle spawn
+    int deltaDistancePopObstacle = 4;// distance between every obstacle spawn
     //Pop obstacles
     private Vec2 speedImpulse;
     private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
@@ -270,7 +270,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
         Input input = gc.getInput();
 
-        if (input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_Z)) {
+        if (input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_Z) || input.isKeyDown(Input.KEY_W)) {
             player.moveImpulse(Player.upImpulseVec);
             ((Player) player.getSprite()).goUp();
         } else if (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {

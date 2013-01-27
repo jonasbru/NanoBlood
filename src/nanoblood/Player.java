@@ -39,7 +39,7 @@ public class Player extends Sprite {
     Animation shield;
     boolean shieldActivated = false;
     Date lastShieldActivation = null;
-    int shieldSeconds = 5;
+    int shieldSeconds = 2;
     Image canons;
     final int VERTICAL_SPEED = 8;
 
