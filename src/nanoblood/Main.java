@@ -57,6 +57,7 @@ public class Main extends StateBasedGame{
         this.addState(new MainMenu(MAINMENU));
         this.addState(new GamePlay(GAMEPLAY));
         this.addState(new GameOver(GAMEOVER));
+        this.addState(new Tutorial(TUTORIAL));
     }
 
 }

@@ -169,7 +169,7 @@ public class Player extends Sprite {
         this.shieldActivated = active;
         if (active) {
             lastShieldActivation = new Date();
-            SoundManager.INSTANCE.playAsSoundEffect(SoundID.BONUS, true);
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.BONUS, 1f, 0.4f, true);
         }
     }
 

@@ -32,6 +32,8 @@ public class MainMenu extends BasicGameState implements ComponentListener {
     private GameContainer lastgc;
     private StateBasedGame lastsbg;
     private Image bg2;
+    private Image credits;
+    
     private boolean lightOn = false;
 
     MainMenu(int stateID) {
@@ -46,6 +48,8 @@ public class MainMenu extends BasicGameState implements ComponentListener {
     public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
         bg = new Image("sprites/main_menu.jpg");
         bg2 = new Image("sprites/little_lights.png");
+        credits = new Image("sprites/credits.png");
+        
         soundOffImg = Sprite.getImage("sprites/sound_menu_OFF.png");
         soundOnImg = Sprite.getImage("sprites/sound_menu_ON.png");
         soundOn = new MouseOverArea(gc, soundOnImg, (int) (0.8 * Main.width), (int) (0.8 * Main.height), this);
@@ -67,6 +71,11 @@ public class MainMenu extends BasicGameState implements ComponentListener {
         if (lightOn) {
             bg2.draw(0, 0);
         }
+        
+        credits.draw(25,
+                Main.height - credits.getHeight() - 25, 
+                credits.getWidth(),
+                credits.getHeight());
     }
 
     public void update(GameContainer gc, StateBasedGame sbg, int i) throws SlickException {

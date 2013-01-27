@@ -5,7 +5,6 @@
 package nanoblood.sound;
 
 import java.io.IOException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.openal.Audio;
 import org.newdawn.slick.openal.SoundStore;
 
