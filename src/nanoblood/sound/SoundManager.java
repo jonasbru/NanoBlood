@@ -22,15 +22,17 @@ public enum SoundManager {
     private SoundStore ss;
     
     private Audio audioBonus;
-    private Audio audioDie;
     private Audio audioHeartBeat;
     private Audio audioMenu;
     private Audio audioPlay;
     private Audio audioSelect;
-    private Audio audioSplash;
-    private Audio audioVirusDies;
+    private Audio audioSplash1;
+    private Audio audioSplash2;
+    private Audio audioSplash3;
     private Audio audioLifeUp;
     private Audio audioGameOver;
+    private Audio audioLaser1;
+    private Audio audioLaser2;
     // TODO collision
     
     private SoundManager() {     
@@ -42,15 +44,17 @@ public enum SoundManager {
         // Load all sounds
         try {
             audioBonus = ss.getOgg("sounds/bonus1.ogg");
-            audioDie = ss.getOgg("sounds/die.ogg");
             audioHeartBeat = ss.getOgg("sounds/heartbeat1.ogg");
             audioMenu = ss.getOgg("sounds/mainmenu.ogg");
             audioPlay = ss.getOgg("sounds/play.ogg");
             audioSelect = ss.getOgg("sounds/select.ogg");
-            audioSplash = ss.getOgg("sounds/splash.ogg");
-            audioVirusDies = ss.getOgg("sounds/virusdies.ogg");
+            audioSplash1 = ss.getOgg("sounds/splash1.ogg");
+            audioSplash2 = ss.getOgg("sounds/splash2.ogg");
+            audioSplash3 = ss.getOgg("sounds/splash3.ogg");
             audioLifeUp = ss.getOgg("sounds/lifeup.ogg");
             audioGameOver = ss.getOgg("sounds/gameover.ogg");
+            audioLaser1 = ss.getOgg("sounds/lasershot1.ogg");
+            audioLaser2 = ss.getOgg("sounds/lasershot2.ogg");
             
         } catch (IOException iOException) {
             iOException.printStackTrace();
@@ -76,9 +80,6 @@ public enum SoundManager {
             case BONUS:
                 return audioBonus;
                 
-            case DIE:
-                return audioDie;
-                
             case HEARTBEAT:
                 return audioHeartBeat;
                 
@@ -91,17 +92,26 @@ public enum SoundManager {
             case SELECT:
                 return audioSelect;
                 
-            case SPLASH:
-                return audioSplash;
+            case SPLASH1:
+                return audioSplash1;
                 
-            case VIRUSDIES:
-                return audioVirusDies;
+            case SPLASH2:
+                return audioSplash2;
+                
+            case SPLASH3:
+                return audioSplash3;
                 
             case LIFEUP:
                 return audioLifeUp;
                 
             case GAMEOVER:
                 return audioGameOver;
+                
+            case LASER1:
+                return audioLaser1;
+                
+            case LASER2:
+                return audioLaser2;
             
             default:
                 return null;
