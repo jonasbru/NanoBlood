@@ -5,7 +5,10 @@
 package nanoblood;
 
 import java.awt.geom.Point2D;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import org.jbox2d.collision.Collision;
+import org.jbox2d.dynamics.World;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -34,18 +37,34 @@ public class LevelManager {
     // TODO black FX layer + functions (alpha)
     private Image blackFxImage;
     // TODO speed FX layer + functions (alpha)
+    private final World w;
+    private float scrolledDistance;
+    static private int foregroundLoadingCounter = 0;
+    
+    static public int getForegroundLoadingCounter() {
+        return LevelManager.foregroundLoadingCounter;
+    }
 
-    public LevelManager() throws SlickException {
-        
+    private void pushNewSegmentsStack(LevelSegment s) {
+        segmentsStack.add(s);
+        collisionsToSegment(s);
+        foregroundLoadingCounter++;
+    }
+    
+    public LevelManager(World w) throws SlickException, FileNotFoundException {
+        this.w = w;
         // Load 2 segments, because of offset
         segmentsStack = new LinkedList<LevelSegment>();
-        segmentsStack.add(selectNextSegment());
+        LevelSegment initSegment = new LevelSegment("sprites/map/MAP_" + 1 /* specific segmentId */ + ".png", false, w);
+        pushNewSegmentsStack(initSegment);
         LevelSegment newSegment = selectNextSegment();
         newSegment.setCoords(new Point2D.Float((float)(Main.width - SEGMENT_X_OFFSET), 0f));
-        segmentsStack.add(newSegment);
+        pushNewSegmentsStack(newSegment);
         
         bgStack = new LinkedList<LevelSegment>();
-        bgStack.add(new LevelSegment(BG_IMAGE, false));
+        bgStack.add(new LevelSegment(BG_IMAGE, false, w));
+        
+        lightning = Sprite.getImage("sprites/fx/Lightning.png");
         
         lightning = Sprite.getImage("sprites/fx/Lightning.png");
         
@@ -53,8 +72,8 @@ public class LevelManager {
         blackFxImage.setAlpha(0.0f);
     }
  
-    public void update(double deltaPixels) throws SlickException {
-
+    public void update(double deltaPixels, float scrolledDistance) throws SlickException, FileNotFoundException {
+        this.scrolledDistance = scrolledDistance;
         if (deltaPixels <= 0) {
             return;
         }
@@ -69,11 +88,12 @@ public class LevelManager {
             if (segmentsStack.size() <= 2  && headTopRightX <= 2 * SEGMENT_X_OFFSET) {
                 // Head segment is starting to go out of screen load another one
                 LevelSegment newSegment = selectNextSegment();
+                collisionsToSegment(newSegment);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * segmentsStack.size() + headTopLeftX - 2* SEGMENT_X_OFFSET), 0));
-                segmentsStack.add(newSegment);
-                
+                pushNewSegmentsStack(newSegment);
             } else if (headTopLeftX <= -Main.width - SEGMENT_X_OFFSET) {
                 // Head segment is out of screen, remove it
+                headSegment.goodBye(w);
                 segmentsStack.remove();
             }
         }
@@ -90,7 +110,7 @@ public class LevelManager {
 
             if (headX <= 0 && bgStack.size() < 2) {
                 // Head segment is starting to go out of screen load another one
-                LevelSegment newSegment = new LevelSegment(BG_IMAGE, false);
+                LevelSegment newSegment = new LevelSegment(BG_IMAGE, false, null);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * bgStack.size() + headX), 0));
                 bgStack.add(newSegment);
                 
@@ -124,16 +144,23 @@ public class LevelManager {
         lightning.draw(0, 0, Main.width, Main.height);
     }
 
-    private LevelSegment selectNextSegment() throws SlickException {
+    private LevelSegment selectNextSegment() throws SlickException, FileNotFoundException {
         int segmentId = SEGMENT_IDS[(int) (Math.floor(Math.random() * SEGMENT_IDS.length))];
         
         // Flip desactivé
         boolean isFlippedHorizontally = false;//Math.random() > 0.5 ? true : false;     
         
-        return new LevelSegment("sprites/map/MAP_" + segmentId + ".png", isFlippedHorizontally);
+        return new LevelSegment("sprites/map/MAP_" + segmentId + ".png", isFlippedHorizontally, w);
     }
     
     public void setBlackFxAlpha(float alpha) {
         blackFxImage.setAlpha(alpha);
+    }
+
+    private void collisionsToSegment(LevelSegment newSegment) {
+        CollisionsCollection cc = newSegment.getCC();
+        if (null != cc) {
+            cc.injectIntoWorld(w, scrolledDistance);
+        }
     }
 }
