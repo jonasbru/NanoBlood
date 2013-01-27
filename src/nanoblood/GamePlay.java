@@ -96,6 +96,9 @@ public class GamePlay extends BasicGameState implements IObservable {
     private boolean hasChanged;
     private ArrayList<IObserver> observers;
     
+    private GameContainer lastgc;
+    private StateBasedGame lastsbg;
+    
     GamePlay(int stateID) {
         this.stateID = stateID;
     }
@@ -158,6 +161,9 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
+        this.lastgc = gc;
+        this.lastsbg = sbg;
+        
         this.levelManager.render(gc, sbg, grphcs);
 
         for (StaticObject so : this.objects) {
@@ -209,7 +215,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         
         // TODO game over screen
         if (life <= 0) {
-            
+            this.lastsbg.enterState(Main.GAMEOVER);
         }
     }
 
