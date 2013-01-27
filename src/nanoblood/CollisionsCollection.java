@@ -30,7 +30,9 @@ public class CollisionsCollection {
             Scanner sc = new Scanner(new File(path));
             while (sc.hasNext()) {
                 Point2D a = new Point2D.Double();
-                a.setLocation(sc.nextDouble() * Main.width, sc.nextDouble() * Main.height);
+                double y = sc.nextDouble() * Main.height;
+                double x = sc.nextDouble() * Main.width;
+                a.setLocation(x, y);
                 ptsList.add(a);
                 sc.nextLine();
             }
