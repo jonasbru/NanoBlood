@@ -58,7 +58,7 @@ public class LevelManager {
         blackFxImage.setAlpha(0.0f);
     }
  
-    public void update(double deltaPixels) throws SlickException, FileNotFoundException {
+    public void update(double deltaPixels, double scrolledDistance) throws SlickException, FileNotFoundException {
 
         if (deltaPixels <= 0) {
             return;

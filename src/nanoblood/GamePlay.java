@@ -212,7 +212,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         updateObjects();
         updateSplashes();
         try {
-            this.levelManager.update(m2px(scrollDelta));
+            this.levelManager.update(m2px(scrollDelta), m2px(scrolledDistance));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(GamePlay.class.getName()).log(Level.SEVERE, null, ex);
         }

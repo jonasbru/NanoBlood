@@ -24,7 +24,7 @@ public class CollisionsCollection {
     Body body;
     float radius;
 
-    public static CollisionsCollection fromFile(String path, float radius)  {
+    public static CollisionsCollection fromFile(String path, float radius) {
         try {
             List<Point2D> ptsList = new ArrayList<Point2D>(100);
             Scanner sc = new Scanner(new File(path));
@@ -58,23 +58,22 @@ public class CollisionsCollection {
             int dy = (int) (p.getY() / (double) n);
             // There's room for another one in between
             for (int j = 0; j < n; j++) {// Create circles to fill in the blanks as long as there is room for them
-                CircleShape shape = new CircleShape();
-                shape.m_type = ShapeType.CIRCLE;
-                shape.m_radius = this.radius;
-                shape.m_p.x = (float) (p.getX() + dx);
-                shape.m_p.y = (float) (p.getY() + dy);
-                body.createFixture(shape, 1.0f);//density=1.0
+                inject(new Point2D.Double(p.getX() + (j+1) * dx, p.getY() + dy * (j+1)));
             }
-            CircleShape shape = new CircleShape();
-            shape.m_type = ShapeType.CIRCLE;
-            shape.m_radius = this.radius;
-            shape.m_p.x = (float) p.getX();
-            shape.m_p.y = (float) p.getY();
-            body.createFixture(shape, 1.0f);//density=1.0
         }
     }
-    
+
     public void removeFromWorld(World w) {
         w.destroyBody(body);
+    }
+
+    private void inject(Point2D p) {
+        System.out.println("Injecting circle at point=" + p);
+        CircleShape shape = new CircleShape();
+        shape.m_type = ShapeType.CIRCLE;
+        shape.m_radius = this.radius;
+        shape.m_p.x = (float) p.getX();
+        shape.m_p.y = (float) p.getY();
+        body.createFixture(shape, 1.0f);//density=1.0
     }
 }
