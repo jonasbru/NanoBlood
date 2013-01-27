@@ -223,7 +223,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
             float scoreModifier = getScoreModifier();
             addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
-
+            
             if (currentHeartBeat < GameParams.INSTANCE.BeatThreshold1()) {
                 addLife(-GameParams.INSTANCE.DamageLowBeat());
             } else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold4()) {
@@ -236,11 +236,6 @@ public class GamePlay extends BasicGameState implements IObservable {
             
             this.lastSbg.enterState(Main.GAMEOVER);
         }
-
-        // DEBUG score
-        score = (int) bloodSpeed;
-        setChanged();
-        notifyObserver(scoreDisplay);
     }
 
     private float computeImpulseFromHeartBeat(int hb) {
@@ -294,22 +289,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         // Update HB display
         this.setChanged();
         notifyObserver(heartBeatDisplay);
-
-        // DEBUG score
-        if (DBG && input.isKeyPressed(Input.KEY_TAB)) {
-            score += 100;
-            setChanged();
-            notifyObserver(scoreDisplay);
-        }
-
-        // DEBUG life
-        if (DBG && input.isKeyPressed(Input.KEY_A)) {
-            if (life > 0) {
-                life -= 10;
-            }
-            setChanged();
-            notifyObserver(lifeDisplay);
-        }
+        
     }
 
     private void updateObjects() {
@@ -500,8 +480,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     public void addScore(int dScore) {
-        System.out.println("Score: " + score);
-        score += score;
+        score += dScore;
         setChanged();
         notifyObserver(scoreDisplay);
     }
