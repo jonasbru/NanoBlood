@@ -40,12 +40,19 @@ public class HeartBeatDisplay implements IObserver {
     
     private float heartBeat;
     private Image heartBeatBackground;
+    private Image cursorImage;
     private float scoreModifier;
     private UnicodeFont unicodeFont;
+    
+    private int cursor1;
+    private int cursor2;
+    private int cursor3;
+    private int cursor4;
 
     public HeartBeatDisplay() throws SlickException {
         this.heartBeat = 0f;
         heartBeatBackground = Sprite.getImage("sprites/ui/HeartBar.png");
+        cursorImage = Sprite.getImage("sprites/ui/HeartBarCursor.png");
         scoreModifier = 0f;
         
         Font javaFont = null;
@@ -63,6 +70,21 @@ public class HeartBeatDisplay implements IObserver {
         unicodeFont.getEffects().add(new OutlineEffect(3, new java.awt.Color(0, 255, 100, 64)));
         unicodeFont.addGlyphs("0123456789 x.");
         unicodeFont.loadGlyphs();
+        
+        cursor1 = (int) (X_OFFSET + CONTENT_X_OFFSET + 
+                GameParams.INSTANCE.BeatThreshold1() *
+                CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
+        cursor2 = (int) (X_OFFSET + CONTENT_X_OFFSET + 
+                GameParams.INSTANCE.BeatThreshold2() *
+                CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
+        cursor3 = (int) (X_OFFSET + CONTENT_X_OFFSET + 
+                GameParams.INSTANCE.BeatThreshold3() *
+                CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
+        cursor4 = (int) (X_OFFSET + CONTENT_X_OFFSET + 
+                GameParams.INSTANCE.BeatThreshold4() *
+                CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
+        
+        
     }
 
     @Override
@@ -77,16 +99,24 @@ public class HeartBeatDisplay implements IObserver {
 
         // bar BG
         heartBeatBackground.draw(X_OFFSET, Main.height - 40 - Y_OFFSET);
+        
+        int y = Main.height - 40 - Y_OFFSET + CONTENT_Y_OFFSET;
 
-        if (heartBeat >= 0 && heartBeat < GameParams.INSTANCE.MaxBeat()) {
+        if (heartBeat >= 0 && heartBeat <= GameParams.INSTANCE.MaxBeat()) {
             int hbCursorPos = (int) (heartBeat * CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
+            
 
             gr.setColor(new Color(0, 255, 100));
             gr.drawLine(X_OFFSET + CONTENT_X_OFFSET + hbCursorPos,
-                    Main.height - 40 - Y_OFFSET + CONTENT_Y_OFFSET,
+                    y,
                     X_OFFSET + CONTENT_X_OFFSET + hbCursorPos,
-                    Main.height - 40 - Y_OFFSET + CONTENT_Y_OFFSET + 21);
+                    y + CONTENT_HEIGHT);
         }
+        
+        cursorImage.draw(cursor1 - 8 , y + 16, 16, 16);
+        cursorImage.draw(cursor2 - 8 , y + 16, 16, 16);
+        cursorImage.draw(cursor3 - 8 , y + 16, 16, 16);
+        cursorImage.draw(cursor4 - 8 , y + 16, 16, 16);
         
         String scoreText = "x " + scoreModifier;
         gr.setColor(Color.white);

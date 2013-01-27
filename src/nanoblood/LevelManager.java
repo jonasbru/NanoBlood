@@ -29,6 +29,8 @@ public class LevelManager {
     private LinkedList<LevelSegment> segmentsStack;
     private LinkedList<LevelSegment> bgStack;
     
+    private Image lightning;
+    
     // TODO black FX layer + functions (alpha)
     private Image blackFxImage;
     // TODO speed FX layer + functions (alpha)
@@ -44,6 +46,8 @@ public class LevelManager {
         
         bgStack = new LinkedList<LevelSegment>();
         bgStack.add(new LevelSegment(BG_IMAGE, false));
+        
+        lightning = Sprite.getImage("sprites/fx/Lightning.png");
         
         blackFxImage = Sprite.getImage("sprites/fx/BlackFX.png");
         blackFxImage.setAlpha(0.0f);
@@ -116,6 +120,8 @@ public class LevelManager {
         if (blackFxImage.getAlpha() > 0) {
             blackFxImage.draw(0, 0);
         }
+        
+        lightning.draw(0, 0, Main.width, Main.height);
     }
 
     private LevelSegment selectNextSegment() throws SlickException {

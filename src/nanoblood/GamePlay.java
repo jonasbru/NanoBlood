@@ -197,7 +197,6 @@ public class GamePlay extends BasicGameState implements IObservable {
             lastTick = currentTime;
             
             float scoreModifier = getScoreModifier();
-            System.out.println("HB: " +currentHeartBeat + ", Modifier: " + scoreModifier);
             addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
             
             if (currentHeartBeat < GameParams.INSTANCE.BeatThreshold1()) {
@@ -412,8 +411,10 @@ public class GamePlay extends BasicGameState implements IObservable {
      * @param delta
      */
     private void playerHeartBeat(int delta) {
-        speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
-        playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
+        if (currentHeartBeat <= GameParams.INSTANCE.MaxBeat()) {
+            speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
+            playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
+        }
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
     }
