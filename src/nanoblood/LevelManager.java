@@ -77,6 +77,7 @@ public class LevelManager {
                 
             } else if (headTopLeftX <= -Main.width - SEGMENT_X_OFFSET) {
                 // Head segment is out of screen, remove it
+                headSegment.goodBye(w);
                 segmentsStack.remove();
             }
         }
@@ -93,7 +94,7 @@ public class LevelManager {
 
             if (headX <= 0 && bgStack.size() < 2) {
                 // Head segment is starting to go out of screen load another one
-                LevelSegment newSegment = new LevelSegment(BG_IMAGE, false, w);
+                LevelSegment newSegment = new LevelSegment(BG_IMAGE, false, null);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * bgStack.size() + headX), 0));
                 bgStack.add(newSegment);
                 

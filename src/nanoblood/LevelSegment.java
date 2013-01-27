@@ -22,7 +22,13 @@ public class LevelSegment extends Sprite {
         this.coords = new Point2D.Double(0, 0);
         this.isHorizontallyFlipped = isFlipped;
         this.segmentImage = Sprite.getImage(imagePath);
-        this.cc = CollisionsCollection.fromFile(imagePath.replace(".png", ".map"), 1.0f);
+        if (null != w) {// if null is passed, then it means we are not concerned about collisions
+            this.cc = CollisionsCollection.fromFile(imagePath.replace(".png", ".map"), 1.0f);
+        }
+    }
+    
+    public CollisionsCollection getCC() {
+        return this.cc;
     }
 
     @Override
@@ -38,4 +44,8 @@ public class LevelSegment extends Sprite {
     public void addToX(double dx) {
         this.coords.setLocation(coords.getX() + dx, coords.getY());
     }
+    
+    public void goodBye(World w) {
+        this.cc.removeFromWorld(w);
+    } 
 }

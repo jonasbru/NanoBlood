@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.dynamics.Body;
@@ -22,15 +24,20 @@ public class CollisionsCollection {
     Body body;
     float radius;
 
-    public static CollisionsCollection fromFile(String path, float radius) throws FileNotFoundException {
-        List<Point2D> ptsList = new ArrayList<Point2D>(100);
-        Scanner sc = new Scanner(new File(path));
-        while (sc.hasNext()) {
-            Point2D a = new Point2D.Double() {
-            };
-            ptsList.add(a);
+    public static CollisionsCollection fromFile(String path, float radius)  {
+        try {
+            List<Point2D> ptsList = new ArrayList<Point2D>(100);
+            Scanner sc = new Scanner(new File(path));
+            while (sc.hasNext()) {
+                Point2D a = new Point2D.Double() {
+                };
+                ptsList.add(a);
+            }
+            return new CollisionsCollection(ptsList, radius);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CollisionsCollection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new CollisionsCollection(ptsList, radius);
+        return null;
     }
 
     public CollisionsCollection(List<Point2D> ptsList, float radius) {
@@ -65,5 +72,9 @@ public class CollisionsCollection {
             shape.m_p.y = (float) p.getY();
             body.createFixture(shape, 1.0f);//density=1.0
         }
+    }
+    
+    public void removeFromWorld(World w) {
+        w.destroyBody(body);
     }
 }
