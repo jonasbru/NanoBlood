@@ -175,7 +175,7 @@ public class Player extends Sprite {
             Date d = new Date();
             float r = shieldSeconds * 1000 - (d.getTime() - lastShieldActivation.getTime());
 
-            if (r >= 0) {
+            if (r <= 0) {
                 shieldActivated = false;
             }
         }
