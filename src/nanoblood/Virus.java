@@ -50,7 +50,7 @@ public class Virus extends Obstacle {
     public void colideWithPlayer() {
         this.remove = true;
 
-        if (!GamePlay.getGP().player.isShieldActivated()) {
+        if (!((Player)GamePlay.getGP().player.getSprite()).isShieldActivated()) {
             GamePlay.getGP().life -= 25;
 
             GamePlay.getGP().setChanged();

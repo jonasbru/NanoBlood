@@ -50,6 +50,6 @@ public class Bouclier extends Obstacle {
     public void colideWithPlayer() {
         this.remove = true;
 
-        GamePlay.getGP().player.activateShield(true);
+        ((Player)GamePlay.getGP().player.getSprite()).activateShield(true);
     }
 }

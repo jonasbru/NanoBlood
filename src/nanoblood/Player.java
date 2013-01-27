@@ -19,12 +19,11 @@ import org.newdawn.slick.geom.Circle;
  */
 public class Player extends Sprite {
 
-    private final Body body;
-    private Vec2 topImpulseVec = new Vec2(0.0f, 5000.0f);
-    private Vec2 downImpulseVec = new Vec2(0.0f, -5000.0f);
-    protected static final float INIT_X = 43;
-    protected static final float INIT_Y = 13;
+    static final protected Vec2 upImpulseVec = new Vec2(0.0f, 5000.0f);
+    static final protected Vec2 downImpulseVec = new Vec2(0.0f, -5000.0f);
+    protected static final float INIT_X = Main.PLAYER_X;
     protected static final float WIDTH = 42;
+    protected static final float INIT_Y = Main.height / 2 - WIDTH / 2;
     protected static final float HEIGHT = 43;
 
     private enum Anim {
@@ -52,8 +51,7 @@ public class Player extends Sprite {
         return this.staticShip.getHeight();
     }
 
-    public Player(Body body) throws SlickException {
-        this.body = body;
+    public Player() throws SlickException {
         this.staticShip = Sprite.getImage("sprites/player/static.png");
         this.canons = Sprite.getImage("sprites/player/canons.png");
         this.canons.rotate(90);
@@ -102,13 +100,7 @@ public class Player extends Sprite {
 
     @Override
     public Renderable getRenderable() {
-        //* Updating graphics
-        Vec2 pos = body.getPosition();
-        float x = GamePlay.m2px(pos.x) % Main.width;
-        float y = GamePlay.yFromPhysicsToSlick(GamePlay.m2px(pos.y));
-        this.coords.setLocation(x, y);
-        this.boundingBox.setCenterX(x + 50);
-        this.boundingBox.setCenterY(y + 50);
+
         //* Sending actual renderable
         switch (this.currentAnim) {
             case UP_GO:
@@ -128,8 +120,6 @@ public class Player extends Sprite {
     }
 
     public void goUp() {
-        body.applyLinearImpulse(topImpulseVec, body.getPosition());
-
         if (currentAnim != Anim.UP_GO && this.upGo.isStopped()) {
             this.upBack.stop();
             this.downGo.stop();
@@ -142,8 +132,6 @@ public class Player extends Sprite {
     }
 
     public void goDown() {
-        body.applyLinearImpulse(downImpulseVec, body.getPosition());
-
         if (currentAnim != Anim.DOWN_GO && this.downGo.isStopped()) {
             this.upGo.stop();
             this.upBack.stop();
