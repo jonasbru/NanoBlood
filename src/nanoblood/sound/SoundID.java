@@ -11,14 +11,16 @@ package nanoblood.sound;
 public enum SoundID {
 
     BONUS, 
-    DIE, 
     HEARTBEAT, 
     MENU, 
     PLAY, 
     SELECT, 
-    SPLASH, 
-    VIRUSDIES, 
+    SPLASH1, 
+    SPLASH2, 
+    SPLASH3, 
     LIFEUP, 
-    GAMEOVER;
+    GAMEOVER,
+    LASER1,
+    LASER2;
     
 }

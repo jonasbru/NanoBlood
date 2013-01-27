@@ -100,8 +100,26 @@ public class HeartBeatDisplay implements IObserver {
         // bar BG
         heartBeatBackground.draw(X_OFFSET, Main.height - 40 - Y_OFFSET);
         
+        int x = X_OFFSET + CONTENT_X_OFFSET;
         int y = Main.height - 40 - Y_OFFSET + CONTENT_Y_OFFSET;
-
+        
+        // Bar bg color sections
+        gr.setColor(new Color(255,0, 0, 128));
+        gr.fillRect(x, y, cursor1 - x, CONTENT_HEIGHT);
+        
+        gr.setColor(new Color(255,255, 0, 128));
+        gr.fillRect(cursor1, y, cursor2 - cursor1, CONTENT_HEIGHT);
+       
+        gr.setColor(new Color(0, 255, 0, 128));
+        gr.fillRect(cursor2, y, cursor3 - cursor2, CONTENT_HEIGHT);
+        
+        gr.setColor(new Color(255, 255, 0, 128));
+        gr.fillRect(cursor3, y, cursor4 - cursor3, CONTENT_HEIGHT);
+        
+        gr.setColor(new Color(255, 0, 0, 128));
+        gr.fillRect(cursor4, y, x + CONTENT_WIDTH - cursor4, CONTENT_HEIGHT);
+        
+        // Beat cursor
         if (heartBeat >= 0 && heartBeat <= GameParams.INSTANCE.MaxBeat()) {
             int hbCursorPos = (int) (heartBeat * CONTENT_WIDTH / GameParams.INSTANCE.MaxBeat());
             
@@ -113,6 +131,8 @@ public class HeartBeatDisplay implements IObserver {
                     y + CONTENT_HEIGHT);
         }
         
+        
+        // Beat threshold cursors
         cursorImage.draw(cursor1 - 8 , y + 16, 16, 16);
         cursorImage.draw(cursor2 - 8 , y + 16, 16, 16);
         cursorImage.draw(cursor3 - 8 , y + 16, 16, 16);
