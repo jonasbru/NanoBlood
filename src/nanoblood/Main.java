@@ -24,11 +24,11 @@ public class Main extends StateBasedGame{
     public static final String title = "NanoBlood";
     public static final int PLAYER_X = Main.width / 10;
     public static final int fpslimit = 60;
-    public static final int MAINMENU = 0;
-    public static final int GAMEPLAY = 1;
-    public static final int GAMEOVER = 2;
-    public static final int TUTORIAL = 3;
-    public static final int CREDITS = 4;
+    public static final int LOGO = 0;
+    public static final int MAINMENU = 1;
+    public static final int GAMEPLAY = 2;
+    public static final int GAMEOVER = 3;
+    public static final int TUTORIAL = 4;
 
     public static void main(String[] args) throws SlickException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 
@@ -54,6 +54,7 @@ public class Main extends StateBasedGame{
 
     @Override
     public void initStatesList(GameContainer gc) throws SlickException {
+        this.addState(new LogoScreen(LOGO));
         this.addState(new MainMenu(MAINMENU));
         this.addState(new GamePlay(GAMEPLAY));
         this.addState(new GameOver(GAMEOVER));
