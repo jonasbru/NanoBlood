@@ -51,7 +51,11 @@ private enum Anim {
     @Override
     public void colideWithPlayer() {
         this.remove = true;
+
+        GamePlay.getGP().life += 20;
+
+        GamePlay.getGP().setChanged();
+        GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
         SoundManager.INSTANCE.playAsSoundEffect(SoundID.LIFEUP, false);
-        GamePlay.getGP().addLife(50);
     }
 }
