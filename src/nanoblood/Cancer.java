@@ -26,7 +26,7 @@ public class Cancer extends Obstacle {
 
     public Cancer() throws SlickException {
 
-        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getX() + 50, 20);
+        this.boundingBox = new Circle((int) this.coords.getX() + 75, (int) this.coords.getY() + 75, 40);
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {

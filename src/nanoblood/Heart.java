@@ -25,7 +25,7 @@ private enum Anim {
 
     public Heart() throws SlickException {
 
-        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getX() + 50, 20);
+        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getY() + 50, 35);
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {

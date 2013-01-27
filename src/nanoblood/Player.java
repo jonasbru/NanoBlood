@@ -4,7 +4,6 @@
  */
 package nanoblood;
 
-import java.awt.Point;
 import java.util.Date;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -12,7 +11,7 @@ import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Renderable;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Circle;
 
 /**
  *
@@ -59,7 +58,8 @@ public class Player extends Sprite {
         this.canons = Sprite.getImage("sprites/player/canons.png");
         this.canons.rotate(90);
 
-        this.boundingBox = new Rectangle(INIT_X, INIT_Y, WIDTH, HEIGHT);
+//        this.boundingBox = new Rectangle(INIT_X, INIT_Y, WIDTH, HEIGHT);
+        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getY() + 50, 25);
 
         Image anim[] = new Image[5];
         for (int i = 0; i < anim.length; i++) {
@@ -107,8 +107,8 @@ public class Player extends Sprite {
         float x = GamePlay.m2px(pos.x) % Main.width;
         float y = GamePlay.yFromPhysicsToSlick(GamePlay.m2px(pos.y));
         this.coords.setLocation(x, y);
-        this.boundingBox.setY(y);
-        this.boundingBox.setX(x);
+        this.boundingBox.setCenterX(x + 50);
+        this.boundingBox.setCenterY(y + 50);
         //* Sending actual renderable
         switch (this.currentAnim) {
             case UP_GO:
@@ -187,7 +187,7 @@ public class Player extends Sprite {
             Date d = new Date();
             float r = shieldSeconds * 1000 - (d.getTime() - lastShieldActivation.getTime());
 
-            if (r <= 0) {
+            if (r >= 0) {
                 shieldActivated = false;
             }
         }
