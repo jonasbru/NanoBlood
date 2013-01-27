@@ -5,6 +5,10 @@
 package nanoblood.ui;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import nanoblood.GamePlay;
 import nanoblood.Main;
 import nanoblood.util.IObservable;
@@ -17,6 +21,7 @@ import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.font.effects.OutlineEffect;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.util.ResourceLoader;
 
 /**
  *
@@ -28,19 +33,26 @@ public class ScoreDisplay implements IObserver {
     private final static int Y_OFFSET = 20;
     
     int score;
-    UnicodeFont font;
+    UnicodeFont unicodeFont;
     
     public ScoreDisplay() throws SlickException {
         score = 0;
         
-        font = new UnicodeFont(new Font(Font.SANS_SERIF, Font.ITALIC, 72)); // TODO choisir font
-        font.getEffects().add(new ColorEffect(java.awt.Color.white));
-        font.getEffects().add(new OutlineEffect(4, new java.awt.Color(0, 255, 100, 128)));
-        font.addGlyphs("0123456789 pts");
-        font.loadGlyphs();
+        Font javaFont = null;
+        try {
+            javaFont = Font.createFont(Font.TRUETYPE_FONT, 
+         ResourceLoader.getResourceAsStream("fonts/LCD_Mono_Normal.ttf"));
+        } catch (FontFormatException ex) {
+            Logger.getLogger(ScoreDisplay.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ScoreDisplay.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        
-        
+        unicodeFont = new UnicodeFont(javaFont, 72, false, false);
+        unicodeFont.getEffects().add(new ColorEffect(java.awt.Color.white));
+        unicodeFont.getEffects().add(new OutlineEffect(4, new java.awt.Color(0, 255, 100, 64)));
+        unicodeFont.addGlyphs("0123456789 pts");
+        unicodeFont.loadGlyphs();
     }
 
     @Override
@@ -52,11 +64,10 @@ public class ScoreDisplay implements IObserver {
     
     public void render(GameContainer gc, StateBasedGame sbg, Graphics gr) {
         String scoreText = score + " pts";
-        int textWidth = font.getWidth(scoreText);
+        int textWidth = unicodeFont.getWidth(scoreText);
         
         gr.setColor(Color.white);
-        gr.setFont(font);
-        // TODO outline effect
+        gr.setFont(unicodeFont);
         gr.drawString(scoreText, Main.width - X_OFFSET - textWidth, Y_OFFSET);
         
     }

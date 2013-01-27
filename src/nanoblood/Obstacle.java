@@ -14,18 +14,27 @@ import org.newdawn.slick.SlickException;
 public abstract class Obstacle extends StaticObject {
 
     public static Obstacle getRandomObstacle() throws SlickException {
-        int rand = (int) (Math.random() * 5);
-        if(rand < 5) {
+        int rand = (int) (Math.random() * 14);
+        if(rand < 1) {
             return new Cancer();
-        }
-        if(rand < 2) {
-            return new GlobuleBlanc();
         }
         if(rand < 3) {
             return new Virus();
         }
+        if(rand < 5) {
+            return new GlobuleBlanc();
+        }
+        if(rand < 10) {
+            return new GlobuleRouge();
+        }
+        if(rand < 12) {
+            return new Bouclier();
+        }
+        if(rand < 14) {
+            return new Heart();
+        }
 
-        return new GlobuleRouge();
+        return null;
     }
 
     @Override

@@ -31,10 +31,14 @@ import org.newdawn.slick.state.StateBasedGame;
 
 /**
  *
- * @author jonas
+ * @author jammers 2013
  */
 public class GamePlay extends BasicGameState implements IObservable {
-
+    
+    private static GamePlay gp = null;
+    public static GamePlay getGP() {
+        return gp;
+    }
     class Pair<T1, T2> {
 
         public T1 first;
@@ -47,12 +51,12 @@ public class GamePlay extends BasicGameState implements IObservable {
     
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
-    final int bloodSpeedImpulse = 3;
+    final int bloodSpeedImpulse = 1;
     final double bloodSpeedDecrease = 0.01;
     static public final int IMPULSE_COEFF_SLOW = 13;
     static public final int IMPULSE_COEFF_MEDIUM = 16;
-    static public final int IMPULSE_COEFF_HARD = 20;
-    static public final int IMPULSE_COEFF_CRAZY = 30;
+    static public final int IMPULSE_COEFF_HARD = 16; //20 avant
+    static public final int IMPULSE_COEFF_CRAZY = 16; //30 avant
     private Vec2 gravity;
 //	private BodyDef gndBodydef;
 //	private Body gndBody;
@@ -65,11 +69,13 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int velocityIterations;
     private int positionIterations;
     private World world;
+
     int totalDistance = 0;
     float scrolledDistance = 0.0f;
     int nextDistancePopObstacle;
     int deltaDistancePopObstacle = 200;// distance between every obstacle spawn
-
+    
+    //Pop obstacles
     private Vec2 speedImpulse;
     private int currentHeartBeat = INITIAL_HEARTBEATS; // Current heart beats rhythm @TODO compute its average
     //* Note : Those values are heartbeat rhythms...
@@ -82,23 +88,20 @@ public class GamePlay extends BasicGameState implements IObservable {
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
     private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
-    
-    private int score;
-    private float life;
-    
+    int score;
+    float life;
     // TODO timer
-
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
     HeartBeatDisplay heartBeatDisplay;
-    
     // Observable vars
     private boolean hasChanged;
     private ArrayList<IObserver> observers;
-    
+
     GamePlay(int stateID) {
         this.stateID = stateID;
+        gp = this;
     }
 
     @Override
@@ -113,29 +116,29 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<PhysicsObject>();
         
+        this.objects = new ArrayList<PhysicsObject>();
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
-        
+
         // TODO declarer parametres dans un fichier properties : WIP non pushé
         score = 0;
         life = 100;
-        
+
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
         this.lifeDisplay = new LifeDisplay();
         this.heartBeatDisplay = new HeartBeatDisplay();
-        
+
         // Add observers
         this.observers.add(scoreDisplay);
         this.observers.add(lifeDisplay);
         this.observers.add(heartBeatDisplay);
-        
+
         // Notify for 1st time
         this.setChanged();
         this.notifyObservers();
 
-        nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
             this.objects.add(PhysicsObject.createFromCircSprite(o, world));
@@ -161,9 +164,10 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
-        System.out.println("Player : " + this.player.getCoords().getX());
-        System.out.println("Player (2): " + this.player.getPhyCoords().getX());
         ((Player)player.getSprite()).getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
+        if(((Player)player.getSprite()).isShieldActivated()) {
+            ((Player)player.getSprite()).shield.draw((float) this.player.getCoords().getX() - 25, (float) this.player.getCoords().getY() - 25);
+        }
         
         // UI : render last
         this.scoreDisplay.render(gc, sbg, grphcs);
@@ -185,11 +189,11 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
         manageColisions();
-        
+
         if (life <= 0) {
             // TODO game over screen
         }
-        
+
         // DEBUG score
         score = (int) bloodSpeed;
         setChanged();
@@ -201,9 +205,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         if (currentHeartBeat > HEARTBEAT_THRESHOLD_CRAZY) {
             coeff = IMPULSE_COEFF_CRAZY;
         } else if (currentHeartBeat > HEARTBEAT_THRESHOLD_HARD) {
-            coeff = IMPULSE_COEFF_CRAZY;
+            coeff = IMPULSE_COEFF_HARD;
         } else if (currentHeartBeat > HEARTBEAT_THRESHOLD_MEDIUM) {
-            coeff = IMPULSE_COEFF_CRAZY;
+            coeff = IMPULSE_COEFF_MEDIUM;
         } else {
             coeff = IMPULSE_COEFF_SLOW;
         }
@@ -229,28 +233,26 @@ public class GamePlay extends BasicGameState implements IObservable {
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
         }
-        
+
         // Update HB display
         this.setChanged();
         notifyObserver(heartBeatDisplay);
-        
+
         // DEBUG score
-        if (input.isKeyPressed(Input.KEY_TAB)) {
+        if (DBG && input.isKeyPressed(Input.KEY_TAB)) {
             score += 100;
             setChanged();
             notifyObserver(scoreDisplay);
         }
-        
+
         // DEBUG life
-        if (input.isKeyPressed(Input.KEY_A)) {
+        if (DBG && input.isKeyPressed(Input.KEY_A)) {
             if (life > 0) {
                 life -= 10;
             }
             setChanged();
             notifyObserver(lifeDisplay);
         }
-
-        totalDistance += bloodSpeed;//@TODO change that
     }
 
     private void updateObjects() {
@@ -285,8 +287,6 @@ public class GamePlay extends BasicGameState implements IObservable {
         for (PhysicsObject so : this.objects) {
             if (this.player.getSprite().boundingBox.intersects(so.getSprite().getBoundingBox())) {
                 so.colideWithPlayer();
-                
-                // TODO update life value
             }
         }
     }
@@ -302,9 +302,9 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     private void addObjects() throws SlickException {
-        if (totalDistance > nextDistancePopObstacle) {
+        if (scrolledDistance > nextDistancePopObstacle) {
             Obstacle o = Obstacle.getRandomObstacle();
-            o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - (totalDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
+            o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - ((int)scrolledDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
             this.objects.add(PhysicsObject.createFromRectSprite(o, world));
             nextDistancePopObstacle += deltaDistancePopObstacle;
         }
@@ -410,21 +410,24 @@ public class GamePlay extends BasicGameState implements IObservable {
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
     }
-    
+
     public int getScore() {
         return score;
     }
-    
+
     public float getLife() {
         return life;
     }
-    
+
     public float getHeartBeat() {
         return bloodSpeed;
     }
     
-    // --- Observer methods
+    public int getCurrentHeartBeat() {
+        return currentHeartBeat;
+    }
 
+    // --- Observer methods
     @Override
     public void addObserver(IObserver o) {
         observers.add(o);
@@ -449,7 +452,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public boolean hasChanged() {
         return hasChanged;
     }
-    
+
     @Override
     public void notifyObserver(IObserver o) {
         if (hasChanged() && observers.indexOf(o) != -1) {
@@ -457,7 +460,7 @@ public class GamePlay extends BasicGameState implements IObservable {
             clearChanged();
         }
     }
-    
+
     @Override
     public void notifyObservers() {
         if (hasChanged()) {
@@ -467,12 +470,12 @@ public class GamePlay extends BasicGameState implements IObservable {
             clearChanged();
         }
     }
-    
+
     protected void clearChanged() {
         hasChanged = false;
     }
-    
-    protected void setChanged() {
+
+    public void setChanged() {
         hasChanged = true;
     }
     

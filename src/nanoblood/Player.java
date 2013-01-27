@@ -5,6 +5,7 @@
 package nanoblood;
 
 import java.awt.Point;
+import java.util.Date;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.newdawn.slick.Animation;
@@ -17,9 +18,9 @@ import org.newdawn.slick.geom.Rectangle;
  *
  * @author jonas
  */
- public class Player extends Sprite {
-	static final protected Vec2 upImpulseVec = new Vec2(0.0f, 1000.0f);
-	static final protected Vec2 downImpulseVec = new Vec2(0.0f, -1000.0f);
+public class Player extends Sprite {
+	static final protected Vec2 upImpulseVec = new Vec2(0.0f, 5000.0f);
+	static final protected Vec2 downImpulseVec = new Vec2(0.0f, -5000.0f);
 	protected static final float INIT_X = Main.PLAYER_X;
 	protected static final float WIDTH = 42;
     protected static final float INIT_Y = Main.height / 2 - WIDTH/2;
@@ -30,27 +31,27 @@ import org.newdawn.slick.geom.Rectangle;
         STATIC, UP_GO, UP_BACK, DOWN_GO, DOWN_BACK
     }
     Anim currentAnim;
-
     Image staticShip;
-
     Animation downGo;
     Animation downBack;
     Animation upGo;
     Animation upBack;
-
+    Animation shield;
+    boolean shieldActivated = false;
+    Date lastShieldActivation = null;
+    int shieldSeconds = 5;
     Image canons;
-
     final int VERTICAL_SPEED = 8;
-	
-	public int getWidth() {
-		return this.staticShip.getWidth();
-	}
 
-	public int getHeight() {
-		return this.staticShip.getHeight();
-	}
+    public int getWidth() {
+        return this.staticShip.getWidth();
+    }
 
-	public Player() throws SlickException {
+    public int getHeight() {
+        return this.staticShip.getHeight();
+    }
+
+public Player() throws SlickException {
         this.staticShip = Sprite.getImage("sprites/player/static.png");
         this.canons = Sprite.getImage("sprites/player/canons.png");
         this.canons.rotate(90);
@@ -84,6 +85,14 @@ import org.newdawn.slick.geom.Rectangle;
         }
         this.downBack = new Animation(anim, 50, true);
         this.downBack.setLooping(false);
+
+        anim = new Image[20];
+        for (int i = 0; i < anim.length; i++) {
+            anim[i] = Sprite.getImage("sprites/obstacles/BOUCLIER/Shield" + Sprite.intToString(i, 5) + ".png");
+        }
+        this.shield = new Animation(anim, 50, true);
+        this.shield.start();
+
 
         currentAnim = Anim.STATIC;
     }
@@ -150,6 +159,26 @@ import org.newdawn.slick.geom.Rectangle;
 //        this.up.stop();
 //
 //        currentAnim = Anim.STATIC;
+    }
+
+    public void activateShield(boolean active) {
+        this.shieldActivated = active;
+        if (active) {
+            lastShieldActivation = new Date();
+        }
+    }
+
+    public boolean isShieldActivated() {
+        if (shieldActivated) {
+            Date d = new Date();
+            float r = shieldSeconds * 1000 - (d.getTime() - lastShieldActivation.getTime());
+
+            if (r <= 0) {
+                shieldActivated = false;
+            }
+        }
+
+        return this.shieldActivated;
     }
 
     public Image getCanons() {
