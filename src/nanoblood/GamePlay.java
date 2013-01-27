@@ -49,6 +49,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     PhysicsObject player;
     LevelManager levelManager;
     List<PhysicsObject> objects;
+    List<Laser> lasers;
     
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
@@ -116,6 +117,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.player = new PhysicsObject(new Player(), playerBody);
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<PhysicsObject>();
+        this.lasers = new ArrayList<Laser>();
         
         this.objects = new ArrayList<PhysicsObject>();
         this.hasChanged = false;
@@ -220,13 +222,13 @@ public class GamePlay extends BasicGameState implements IObservable {
         return result;
     }
 
-    private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) {
+    private void manageInput(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
         Input input = gc.getInput();
 
-        if (input.isKeyDown(Input.KEY_UP)) {
+        if (input.isKeyDown(Input.KEY_UP) || input.isKeyDown(Input.KEY_Z)) {
             player.moveImpulse(Player.upImpulseVec);
             ((Player)player.getSprite()).goUp();
-        } else if (input.isKeyDown(Input.KEY_DOWN)) {
+        } else if (input.isKeyDown(Input.KEY_DOWN) || input.isKeyDown(Input.KEY_S)) {
             player.moveImpulse(Player.downImpulseVec);
             ((Player)player.getSprite()).goDown();
         } else {
@@ -235,6 +237,14 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (input.isKeyPressed(Input.KEY_SPACE)) { // HEARTBEAT
             playerHeartBeat(delta);
+        }
+
+        if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+            Laser l = new Laser();
+            l.setCoords(player.getCoords());
+            
+
+            lasers.add(l);
         }
 
         // Update HB display
