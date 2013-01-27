@@ -7,6 +7,7 @@ package nanoblood;
 import java.awt.geom.Point2D;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import org.jbox2d.collision.Collision;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -37,6 +38,7 @@ public class LevelManager {
     private Image blackFxImage;
     // TODO speed FX layer + functions (alpha)
     private final World w;
+    private float scrolledDistance;
 
     public LevelManager(World w) throws SlickException, FileNotFoundException {
         this.w = w;
@@ -44,6 +46,7 @@ public class LevelManager {
         segmentsStack = new LinkedList<LevelSegment>();
         segmentsStack.add(selectNextSegment());
         LevelSegment newSegment = selectNextSegment();
+        collisionsToSegment(newSegment);
         newSegment.setCoords(new Point2D.Float((float)(Main.width - SEGMENT_X_OFFSET), 0f));
         segmentsStack.add(newSegment);
         
@@ -58,8 +61,8 @@ public class LevelManager {
         blackFxImage.setAlpha(0.0f);
     }
  
-    public void update(double deltaPixels, double scrolledDistance) throws SlickException, FileNotFoundException {
-
+    public void update(double deltaPixels, float scrolledDistance) throws SlickException, FileNotFoundException {
+        this.scrolledDistance = scrolledDistance;
         if (deltaPixels <= 0) {
             return;
         }
@@ -74,6 +77,7 @@ public class LevelManager {
             if (segmentsStack.size() <= 2  && headTopRightX <= 2 * SEGMENT_X_OFFSET) {
                 // Head segment is starting to go out of screen load another one
                 LevelSegment newSegment = selectNextSegment();
+                collisionsToSegment(newSegment);
                 newSegment.setCoords(new Point2D.Float((float) (Main.width * segmentsStack.size() + headTopLeftX - 2* SEGMENT_X_OFFSET), 0));
                 segmentsStack.add(newSegment);
                 
@@ -141,5 +145,12 @@ public class LevelManager {
     
     public void setBlackFxAlpha(float alpha) {
         blackFxImage.setAlpha(alpha);
+    }
+
+    private void collisionsToSegment(LevelSegment newSegment) {
+        CollisionsCollection cc = newSegment.getCC();
+        if (null != cc) {
+            cc.injectIntoWorld(w, scrolledDistance);
+        }
     }
 }

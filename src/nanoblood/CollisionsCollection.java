@@ -29,9 +29,10 @@ public class CollisionsCollection {
             List<Point2D> ptsList = new ArrayList<Point2D>(100);
             Scanner sc = new Scanner(new File(path));
             while (sc.hasNext()) {
-                Point2D a = new Point2D.Double() {
-                };
+                Point2D a = new Point2D.Double();
+                a.setLocation(sc.nextDouble() * Main.width, sc.nextDouble() * Main.height);
                 ptsList.add(a);
+                sc.nextLine();
             }
             return new CollisionsCollection(ptsList, radius);
         } catch (FileNotFoundException ex) {
@@ -45,21 +46,22 @@ public class CollisionsCollection {
         this.radius = radius;
     }
 
-    public void injectIntoWorld(World w, float x, float y) {
+    public void injectIntoWorld(World w, float scroll) {
         BodyDef bdef = new BodyDef();
-        bdef.position.set(x, y);
+        bdef.position.set(scroll, GamePlay.px2m(GamePlay.ySlick2Physics(0)));
         body = w.createBody(bdef);
 
         for (int i = 0; i < ptsList.size() - 1; i++) {
             Point2D p = ptsList.get(i);
             Point2D p2 = ptsList.get(i + 1);
-            int n = (int) (Point2D.distance(p.getX(), p.getY(), p2.getX(), p2.getY()) / radius);
+            int n = (int) (Point2D.distance(p.getX(), p.getY(), p2.getX(), p2.getY()) / radius);// number of circle we can place in between
             int dx = (int) (p.getX() / (double) n);
             int dy = (int) (p.getY() / (double) n);
             // There's room for another one in between
             for (int j = 0; j < n; j++) {// Create circles to fill in the blanks as long as there is room for them
-                inject(new Point2D.Double(p.getX() + (j+1) * dx, p.getY() + dy * (j+1)));
+                inject(new Point2D.Double(p.getX() + (j+1) * dx, p.getY() + dy * (j+1)), scroll);
             }
+            inject(p, scroll);
         }
     }
 
@@ -67,13 +69,18 @@ public class CollisionsCollection {
         w.destroyBody(body);
     }
 
-    private void inject(Point2D p) {
+    /**
+     * 
+     * @param p point to insert
+     * @param x 
+     */
+    private void inject(Point2D p, float scroll) {
         System.out.println("Injecting circle at point=" + p);
         CircleShape shape = new CircleShape();
         shape.m_type = ShapeType.CIRCLE;
         shape.m_radius = this.radius;
-        shape.m_p.x = (float) p.getX();
-        shape.m_p.y = (float) p.getY();
+        shape.m_p.x = GamePlay.px2m(p.getX() + scroll);
+        shape.m_p.y = GamePlay.px2m(p.getY());
         body.createFixture(shape, 1.0f);//density=1.0
     }
 }
