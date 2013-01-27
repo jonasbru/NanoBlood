@@ -19,7 +19,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class LevelManager {
     
-    public static final int[] SEGMENT_IDS = {  12};
+    public static final int[] SEGMENT_IDS = {1,2,3,4,5,6,7,8,9,10,11,12};
     public static final int SEGMENT_X_OFFSET = 48; //px 
     // TODO public static final int SEGMENTS_COUNT = nb images segments;
     
