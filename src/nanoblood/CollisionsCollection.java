@@ -28,24 +28,24 @@ public class CollisionsCollection {
     float radius;
 
     public static CollisionsCollection fromFile(String path, float radius) {
-        try {
-            List<Point2D> ptsList = new ArrayList<Point2D>(100);
-            Scanner sc = new Scanner(new File(path));
-            sc.useLocale(Locale.US);
-            while (sc.hasNext()) {
-                Point2D a = new Point2D.Double();
-                double y = sc.nextDouble() * Main.height;
-                double x = sc.nextDouble() * Main.width;
-                a.setLocation(x, y);
-                ptsList.add(a);
-                if (sc.hasNext()) {// check in case there is no blank last line
-                    sc.nextLine();
-                }
-            }
-            return new CollisionsCollection(ptsList, radius);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CollisionsCollection.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            List<Point2D> ptsList = new ArrayList<Point2D>(100);
+//            Scanner sc = new Scanner(new File(path));
+//            sc.useLocale(Locale.US);
+//            while (sc.hasNext()) {
+//                Point2D a = new Point2D.Double();
+//                double y = sc.nextDouble() * Main.height;
+//                double x = sc.nextDouble() * Main.width;
+//                a.setLocation(x, y);
+//                ptsList.add(a);
+//                if (sc.hasNext()) {// check in case there is no blank last line
+//                    sc.nextLine();
+//                }
+//            }
+//            return new CollisionsCollection(ptsList, radius);
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(CollisionsCollection.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         return null;
     }
 
@@ -55,19 +55,19 @@ public class CollisionsCollection {
     }
 
     public void injectIntoWorld(World w, float scroll) {
-        BodyDef bdef = new BodyDef();
-        int baseX = LevelManager.getForegroundLoadingCounter() * Main.width;
-        bdef.position.x = baseX;
-        bdef.position.y = GamePlay.px2m(GamePlay.ySlick2Physics(0));
-        bdef.type = BodyType.STATIC;
-        bdef.active = true;
-        body = w.createBody(bdef);
-
-        for (int i = 0; i < ptsList.size() - 1; i++) {
-            Point2D p = ptsList.get(i);
-            inject(p, baseX);
-        }
-        inject(ptsList.get(ptsList.size()-1), baseX);
+//        BodyDef bdef = new BodyDef();
+//        int baseX = LevelManager.getForegroundLoadingCounter() * Main.width;
+//        bdef.position.x = baseX;
+//        bdef.position.y = GamePlay.px2m(GamePlay.ySlick2Physics(0));
+//        bdef.type = BodyType.STATIC;
+//        bdef.active = trus e;
+//        body = w.createBody(bdef);
+//
+//        for (int i = 0; i < ptsList.size() - 1; i++) {
+//            Point2D p = ptsList.get(i);
+//            inject(p, baseX);
+//        }
+//        inject(ptsList.get(ptsList.size()-1), baseX);
 //               BodyDef gndbd = new BodyDef();
 //        gndbd.type = BodyType.STATIC;
 //        gndbd.position.x = baseX + 40;
@@ -86,7 +86,7 @@ public class CollisionsCollection {
     }
 
     public void removeFromWorld(World w) {
-        w.destroyBody(body);
+//        w.destroyBody(body);
     }
 
     /**

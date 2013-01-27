@@ -12,21 +12,21 @@ import org.newdawn.slick.SlickException;
  * @author jammers
  */
 public class LevelSegment extends Sprite {
-    
+
     protected Image segmentImage;
     private boolean isHorizontallyFlipped = false;
     private CollisionsCollection cc;
-    
+
     public LevelSegment(String imagePath, boolean isFlipped, World w) throws SlickException, FileNotFoundException {
-        
+
         this.coords = new Point2D.Double(0, 0);
         this.isHorizontallyFlipped = isFlipped;
         this.segmentImage = Sprite.getImage(imagePath);
-          if (null != w) {// if null is passed, then it means we are not concerned about collisions
-            this.cc = CollisionsCollection.fromFile(imagePath.replace(".png", ".map"), 10.0f);
-        }
+//        if (null != w) {// if null is passed, then it means we are not concerned about collisions
+//            this.cc = CollisionsCollection.fromFile(imagePath.replace(".png", ".map"), 10.0f);
+//        }
     }
-    
+
     public CollisionsCollection getCC() {
         return this.cc;
     }
@@ -35,17 +35,16 @@ public class LevelSegment extends Sprite {
     public Renderable getRenderable() {
         if (this.isHorizontallyFlipped) {
             return this.segmentImage.getFlippedCopy(true, false);
-        }
-        else {
+        } else {
             return segmentImage;
         }
     }
-    
+
     public void addToX(double dx) {
         this.coords.setLocation(coords.getX() + dx, coords.getY());
     }
-    
+
     public void goodBye(World w) {
-        this.cc.removeFromWorld(w);
-    } 
+//        this.cc.removeFromWorld(w);
+    }
 }
