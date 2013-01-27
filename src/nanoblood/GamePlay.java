@@ -238,6 +238,14 @@ public class GamePlay extends BasicGameState implements IObservable {
             }
         }
 
+        if(player.getCoords().getY() < 0 || player.getBody().getPosition().y < 0 || player.getSprite().coords.getY() < 0) {
+            player.getBody().getPosition().y = 0;
+            player.getSprite().setCoords((int)player.getSprite().getCoords().getX(), 0);
+        } else if(player.getCoords().getY() > Main.height || player.getBody().getPosition().y > Main.height || player.getSprite().coords.getY() > Main.height) {
+            player.getBody().getPosition().y = Main.height;
+            player.getSprite().setCoords((int)player.getSprite().getCoords().getX(), Main.height);
+        }
+
         if (life <= 0) {
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
             
