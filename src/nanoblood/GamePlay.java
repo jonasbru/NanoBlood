@@ -70,7 +70,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 //	private PolygonShape gndBox;
     private BodyDef playerBodyDef;
     private Body playerBody;
-    private PolygonShape playerShape;
+    private CircleShape playerShape;
     private FixtureDef playerFD;
     private float timeStep;
     private int velocityIterations;
@@ -91,7 +91,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int heartBeatsSinceLastUpdate = 0;
     protected static final float PIXELS_TO_METERS_RATIO = 10.0f;
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
-    private static boolean DBG = false;
+    private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
     int score;
     float life;
@@ -408,11 +408,11 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBodyDef.position.x = px2m(Main.PLAYER_X);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
-//        playerShape = new CircleShape();
-        playerShape = new PolygonShape();
-        playerShape.setAsBox(px2m(Player.WIDTH/2), px2m(Player.HEIGHT/2));
-//        playerShape.m_radius = 1.0f;
-//        playerShape.m_type = ShapeType.CIRCLE;
+        playerShape = new CircleShape();
+//        playerShape = new PolygonShape();
+//        playerShape.setAsBox(px2m(Player.WIDTH/2), px2m(Player.HEIGHT/2));
+        playerShape.m_radius = 1.0f;
+        playerShape.m_type = ShapeType.CIRCLE;
         playerFD = new FixtureDef();
         playerFD.shape = playerShape;
         playerFD.density = 1.0f;

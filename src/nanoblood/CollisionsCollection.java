@@ -97,9 +97,9 @@ public class CollisionsCollection {
     private void inject(Point2D p, float baseX) {
         CircleShape shape = new CircleShape();
         shape.m_type = ShapeType.CIRCLE;
-        shape.m_radius = 10.0f;
+        shape.m_radius = 40.0f;
         shape.m_p.x = GamePlay.px2m(p.getX() + baseX);
-        shape.m_p.y = GamePlay.px2m(p.getY());
+        shape.m_p.y = GamePlay.px2m(GamePlay.ySlick2Physics((float)p.getY()));
 //        FixtureDef fd = new FixtureDef();
 //        fd.density = 1.0f;
 //        fd.friction = 1.5f;
