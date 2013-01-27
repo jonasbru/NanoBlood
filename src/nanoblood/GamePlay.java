@@ -39,6 +39,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public static GamePlay getGP() {
         return gp;
     }
+
     class Pair<T1, T2> {
 
         public T1 first;
@@ -141,7 +142,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         for (int i = 0; i < 6; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
-            this.objects.add(PhysicsObject.createFromCircSprite(o, world));
+            PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
+            phyObj.move(-50.0f, 0.0f);
+            this.objects.add(phyObj);
         }
     }
 
@@ -259,8 +262,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         List<PhysicsObject> toRemove = new ArrayList<PhysicsObject>();
 
         for (PhysicsObject so : this.objects) {
-            so.move(new Vec2(1.0f, 0.0f));
-
+            so.move(new Vec2(-5.0f * player.getBody().getLinearVelocity().x, 0.0f));
             if (so.getSprite() instanceof Cancer) {
                 Vec2 v = player.getPhyCoordsVec().sub(so.getPhyCoordsVec());
                 
@@ -303,9 +305,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void addObjects() throws SlickException {
         if (scrolledDistance > nextDistancePopObstacle) {
-            Obstacle o = Obstacle.getRandomObstacle();
-            o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - ((int)scrolledDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
-            this.objects.add(PhysicsObject.createFromRectSprite(o, world));
+            spawnRandomObject();
             nextDistancePopObstacle += deltaDistancePopObstacle;
         }
     }
@@ -409,6 +409,14 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
+    }
+
+      private void spawnRandomObject() throws SlickException {
+        Obstacle o = Obstacle.getRandomObstacle();
+        o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - ((int) scrolledDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
+        PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
+        phyObj.move(3.0f, 0.0f);
+        this.objects.add(phyObj);
     }
 
     public int getScore() {
