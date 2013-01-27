@@ -17,54 +17,88 @@ public enum GameParams {
     
     INSTANCE;
     
-    private Properties prop;
-    
-    // Scoring
-    public static int   ScorePerSecond      = 10;
-    public static float ScoreModifierLow    = 0.5f;
-    public static float ScoreModifierNormal = 1f;
-    public static float ScoreModifierHigh   = 3f;
-    
-    // Heart beat
-    public static int   BeatBoost           = 3;
-    public static float BeatDecreaseRate    = 0.01f;
-    public static int   MaxBeat             = 30;
-    public static float LowBeatThreshold    = 10f;
-    public static float HighBeatThreshold   = 20;
-    
-    // Life
-    public static int   MaxLife             = 150;
-    
-    // Maps
-    public static String Maps = "1, 2, 3";
-    public static String MapsSpawnRate= "1, 1, 1";
-    public static boolean HorizontalFlipping=false;
-    
+    private Properties prop;   
     
     private GameParams() {
         prop = new Properties();
         try {
             prop.load(new FileInputStream("data/GameParams.properties"));
             
-            
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
     
+    // Scoring
     public int ScorePerSecond() {
         return Integer.parseInt(prop.getProperty("ScorePerSecond"));
     }
     
-    public float ScoreModifierLow() {
-        return Float.parseFloat(prop.getProperty("ScoreModifierLow"));
+    public float ScoreModifier1() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier1"));
     }
     
-    public float ScoreModifierNormal() {
-        return Float.parseFloat(prop.getProperty("ScoreModifierNormal"));
+    public float ScoreModifier2() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier2"));
     }
     
-    public float ScoreModifierHigh() {
-        return Float.parseFloat(prop.getProperty("ScoreModifierHigh"));
+    public float ScoreModifier3() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier3"));
     }
+    
+    public float ScoreModifier4() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier4"));
+    }
+    
+    public float ScoreModifier5() {
+        return Float.parseFloat(prop.getProperty("ScoreModifier5"));
+    }
+    
+    // Heart beat
+    public int BeatBoost() {
+        return Integer.parseInt(prop.getProperty("BeatBoost"));
+    }
+    
+    public float BeatDecreaseRate() {
+        return Float.parseFloat(prop.getProperty("BeatDecreaseRate"));
+    }
+    
+    public float MaxBeat() {
+        return Float.parseFloat(prop.getProperty("MaxBeat"));
+    }
+    
+    public float BeatThreshold1() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold1"));
+    }
+    
+    public float BeatThreshold2() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold2"));
+    }
+    
+    public float BeatThreshold3() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold3"));
+    }
+    
+    public float BeatThreshold4() {
+        return Float.parseFloat(prop.getProperty("BeatThreshold4"));
+    }
+    
+    // Life
+    public int MaxLife() {
+        return Integer.parseInt(prop.getProperty("MaxLife"));
+    }
+    
+    public int DamageLowBeat() {
+        return Integer.parseInt(prop.getProperty("DamageLowBeat"));
+    }
+    
+    public int DamageHighBeat() {
+        return Integer.parseInt(prop.getProperty("DamageHighBeat"));
+    }
+    
+    // TODO damages
+    
+    // TODO Maps
+    
+    
 }

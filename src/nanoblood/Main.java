@@ -26,8 +26,9 @@ public class Main extends StateBasedGame{
     public static final int fpslimit = 60;
     public static final int MAINMENU = 0;
     public static final int GAMEPLAY = 1;
-    public static final int GAMEEND = 2;
-    public static final int WAIT = 3;
+    public static final int GAMEOVER = 2;
+    public static final int TUTORIAL = 3;
+    public static final int CREDITS = 4;
 
     public static void main(String[] args) throws SlickException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
 
@@ -54,7 +55,8 @@ public class Main extends StateBasedGame{
     @Override
     public void initStatesList(GameContainer gc) throws SlickException {
         this.addState(new MainMenu(MAINMENU));
-		this.addState(new GamePlay(GAMEPLAY));
+        this.addState(new GamePlay(GAMEPLAY));
+        this.addState(new GameOver(GAMEOVER));
     }
 
 }

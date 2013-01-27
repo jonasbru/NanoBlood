@@ -19,6 +19,7 @@ import org.jbox2d.dynamics.World;
 import nanoblood.ui.HeartBeatDisplay;
 import nanoblood.ui.LifeDisplay;
 import nanoblood.ui.ScoreDisplay;
+import nanoblood.util.GameParams;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
 import org.newdawn.slick.GameContainer;
@@ -88,17 +89,26 @@ public class GamePlay extends BasicGameState implements IObservable {
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
     private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
+    
+    long lastTick;
+    long elapsedTime;
+
     int score;
     float life;
-    // TODO timer
+
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
     HeartBeatDisplay heartBeatDisplay;
+    
     // Observable vars
     private boolean hasChanged;
     private ArrayList<IObserver> observers;
+    
+    private GameContainer lastgc;
+    private StateBasedGame lastsbg;
 
+    
     GamePlay(int stateID) {
         this.stateID = stateID;
         gp = this;
@@ -120,9 +130,8 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
 
-        // TODO declarer parametres dans un fichier properties : WIP non pushé
         score = 0;
-        life = 100;
+        life = GameParams.INSTANCE.MaxLife();
 
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
@@ -137,6 +146,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         // Notify for 1st time
         this.setChanged();
         this.notifyObservers();
+        
+        lastTick = System.currentTimeMillis();
+        elapsedTime = 0;
 
         for (int i = 0; i < 6; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
@@ -157,6 +169,9 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
+        this.lastgc = gc;
+        this.lastsbg = sbg;
+        
         this.levelManager.render(gc, sbg, grphcs);
 
         for (PhysicsObject so : this.objects) {
@@ -177,6 +192,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
+        
         removeObjects();
         addObjects();
 
@@ -189,15 +205,30 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
         manageColisions();
-
+        
+        // Update score very second
+        long currentTime = System.currentTimeMillis();
+        elapsedTime = currentTime - lastTick;
+        if (elapsedTime >= 1000) {
+            elapsedTime -= 1000;
+            lastTick = currentTime;
+            
+            float scoreModifier = getScoreModifier();
+            addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
+            
+            if (currentHeartBeat < GameParams.INSTANCE.BeatThreshold1()) {
+                addLife(- GameParams.INSTANCE.DamageLowBeat());
+            }
+            else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold4()) {
+                addLife(- GameParams.INSTANCE.DamageHighBeat());
+            }
+        }
+        
+        // TODO game over screen
         if (life <= 0) {
-            // TODO game over screen
+            this.lastsbg.enterState(Main.GAMEOVER);
         }
 
-        // DEBUG score
-        score = (int) bloodSpeed;
-        setChanged();
-        notifyObserver(scoreDisplay);
     }
 
     private float computeImpulseFromHeartBeat(int hb) {
@@ -405,8 +436,10 @@ public class GamePlay extends BasicGameState implements IObservable {
      * @param delta
      */
     private void playerHeartBeat(int delta) {
-        speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
-        playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
+        //if (currentHeartBeat <= GameParams.INSTANCE.MaxBeat()) {
+            speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
+            playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
+        //}
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
     }
@@ -426,7 +459,40 @@ public class GamePlay extends BasicGameState implements IObservable {
     public int getCurrentHeartBeat() {
         return currentHeartBeat;
     }
-
+    
+    public float getScoreModifier() {
+        if (currentHeartBeat <= GameParams.INSTANCE.BeatThreshold1()) {
+            return GameParams.INSTANCE.ScoreModifier1();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold1()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold2()) {
+            return GameParams.INSTANCE.ScoreModifier2();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold2()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold3()) {
+            return GameParams.INSTANCE.ScoreModifier3();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold3()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold4()) {
+            return GameParams.INSTANCE.ScoreModifier4();
+        }
+        else {
+            return GameParams.INSTANCE.ScoreModifier5();
+        }
+    }
+    
+    public void addLife(int dLife) {
+        life = life + dLife < 0 ? 0 : life + dLife;   
+        setChanged();
+        notifyObserver(lifeDisplay);
+    }
+    
+    public void addScore(int dScore) {
+        score += dScore;
+        setChanged();
+        notifyObserver(scoreDisplay);
+    }
+    
     // --- Observer methods
     @Override
     public void addObserver(IObserver o) {
