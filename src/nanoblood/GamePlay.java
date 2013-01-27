@@ -135,7 +135,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.notifyObservers();
 
         nextDistancePopObstacle = Main.width + deltaDistancePopObstacle;
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 5; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
             this.objects.add(PhysicsObject.createFromCircSprite(o, world));
@@ -161,6 +161,8 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
+        System.out.println("Player : " + this.player.getCoords().getX());
+        System.out.println("Player (2): " + this.player.getPhyCoords().getX());
         ((Player)player.getSprite()).getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
         
         // UI : render last
@@ -215,7 +217,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         Input input = gc.getInput();
 
         if (input.isKeyDown(Input.KEY_UP)) {
-            player.move(Player.upImpulseVec);
+            player.moveImpulse(Player.upImpulseVec);
             ((Player)player.getSprite()).goUp();
         } else if (input.isKeyDown(Input.KEY_DOWN)) {
             player.moveImpulse(Player.downImpulseVec);
@@ -258,9 +260,12 @@ public class GamePlay extends BasicGameState implements IObservable {
             so.move(new Vec2(1.0f, 0.0f));
 
             if (so.getSprite() instanceof Cancer) {
-                Vec2 v = player.getCoordsVec().sub(so.getCoordsVec());
-                System.out.println(v);
+                Vec2 v = player.getPhyCoordsVec().sub(so.getPhyCoordsVec());
+                
                 v.normalize();
+                if (DBG) {
+                    System.out.println("Normalized cancer v-vect=" + v);
+                }
 
                 so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
             }
@@ -316,7 +321,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 //		gndBody.createFixture(gndBox, 0.0f);
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DYNAMIC;
-        playerBodyDef.position.x = px2m(Main.width / 2);
+        playerBodyDef.position.x = px2m(Main.PLAYER_X);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
         playerShape = new PolygonShape();
@@ -343,9 +348,12 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     private void updatePhysics() {
-        Vec2 currPos = player.getCoordsVec();
+        Vec2 currPos = new Vec2(player.getPhyCoordsVec());
         world.step(timeStep, velocityIterations, positionIterations);
-        scrolledDistance += player.getCoordsVec().sub(currPos).x;
+        scrolledDistance += player.getPhyCoordsVec().sub(currPos).x;
+        if (DBG) {
+            System.out.println("Scrolled=" + scrolledDistance);
+        }
         PhysicsObject.setScrolledDistance(scrolledDistance);
         if (DBG) {
             for (PhysicsObject po : objects) {
