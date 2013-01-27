@@ -440,8 +440,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         world.step(timeStep, velocityIterations, positionIterations);
         scrollDelta = player.getPhyCoordsVec().x - currPos.x;
         scrolledDistance += scrollDelta;
-        System.out.println("Player=" + player.getPhyCoordsVec() + "\t" + player.getCoords());
+        
         if (DBG) {
+            System.out.println("Player=" + player.getPhyCoordsVec() + "\t" + player.getCoords());
             System.out.println("Scrolled=" + scrolledDistance);
         }
         PhysicsObject.setScrolledDistance(scrolledDistance);

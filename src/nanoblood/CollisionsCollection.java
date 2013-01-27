@@ -104,6 +104,6 @@ public class CollisionsCollection {
 //        fd.shape = shape;
 //        body.createFixture(fd);
         body.createFixture(shape, 1.0f);//density=1.0
-        System.out.println("Injecting circle at point=" + p + "\t" + shape.m_p);
+//        System.out.println("Injecting circle at point=" + p + "\t" + shape.m_p);
     }
 }
