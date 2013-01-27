@@ -50,7 +50,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     PhysicsObject player;
     LevelManager levelManager;
     List<PhysicsObject> objects;
-    List<Laser> lasers;
+    List<PhysicsObject> lasers;
     List<Splash> splashes;
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
@@ -102,6 +102,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private StateBasedGame lastSbg;
     long lastTick;
     long elapsedTime;
+    boolean laserTop = true;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -119,7 +120,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.player = new PhysicsObject(new Player(), playerBody);
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<PhysicsObject>();
-        this.lasers = new ArrayList<Laser>();
+        this.lasers = new ArrayList<PhysicsObject>();
         this.splashes = new ArrayList<Splash>();
 
         this.objects = new ArrayList<PhysicsObject>();
@@ -180,6 +181,10 @@ public class GamePlay extends BasicGameState implements IObservable {
             so.getRenderable().draw((float) so.getCoords().getX(), (float) so.getCoords().getY());
         }
 
+        for (PhysicsObject so : this.lasers) {
+            so.getRenderable().draw((float) so.getCoords().getX(), (float) so.getCoords().getY());
+        }
+
         this.player.getRenderable().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY());
         ((Player) player.getSprite()).getCanons().draw((float) this.player.getCoords().getX(), (float) this.player.getCoords().getY() - 4);
         if (((Player) player.getSprite()).isShieldActivated()) {
@@ -202,6 +207,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         updateCurrentHB(delta);
         updatePhysics();
         updateObjects();
+        updateLasers();
         updateSplashes();
 
         this.levelManager.update(m2px(scrollDelta));
@@ -271,14 +277,19 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
             Laser l = new Laser();
-            l.setCoords((int)player.getCoords().getX() + (int)scrolledDistance*10, (int)player.getCoords().getY());
-            //lasers.add(l);
+            if(laserTop) {
+                l.setCoords((int) player.getCoords().getX() + (int) scrolledDistance * 10, (int) player.getCoords().getY() - 27);
+            } else {
+                l.setCoords((int) player.getCoords().getX() + (int) scrolledDistance * 10, (int) player.getCoords().getY() + 24);
+            }
+            laserTop = !laserTop;
 
             PhysicsObject phyObj = PhysicsObject.createFromCircSprite(l, world);
 
-            phyObj.move(1500, 0);
+//            phyObj.moveImpulse(new Vec2(150.0f, 0.0f));
+            //phyObj.getBody().applyLinearImpulse(new Vec2(500, 0.0f), phyObj.getBody().getPosition());
 
-            objects.add(phyObj);
+            lasers.add(phyObj);
         }
 
         // Update HB display
@@ -312,7 +323,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
                 v.normalize();
                 if (DBG) {
-//                    System.out.println("Normalized cancer v-vect=" + v);
+                    System.out.println("Normalized cancer v-vect=" + v);
                 }
 
                 so.move((Cancer.MOVEMENT_TO_PLAYER * v.x), (Cancer.MOVEMENT_TO_PLAYER * v.y));
@@ -335,6 +346,30 @@ public class GamePlay extends BasicGameState implements IObservable {
                 objects.get(i).colideWithPlayer();
             }
         }
+
+        for (int j = 0; j < this.lasers.size();) {
+            boolean stop = false;
+            for (int i = 0; i < this.objects.size();) {
+                stop = false;
+                Sprite s = this.objects.get(i).getSprite();
+                Laser l = (Laser) this.lasers.get(j).getSprite();
+                if (s.boundingBox.intersects(l.getBoundingBox())
+                        && (s instanceof Cancer || s instanceof GlobuleBlanc || s instanceof GlobuleRouge || s instanceof Virus)) {
+                    ((Obstacle) s).die();
+                    objects.remove(i);
+                    lasers.remove(j);
+                    stop = true;
+                    break;
+                } else {
+                    i++;
+                }
+            }
+            if(!stop) {
+                j++;
+            }
+        }
+
+
     }
 
     private void removeObjects() {
@@ -473,6 +508,14 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
     }
 
+    private void updateLasers() {
+        for (PhysicsObject po : this.lasers) {
+//            po.getCoords().setLocation(po.getCoords().getX() + 10, po.getCoords().getY());
+//            po.getSprite().coords.setLocation(po.getCoords().getX() + 10, po.getCoords().getY());
+            po.getBody().setTransform(new Vec2((float) po.getBody().getPosition().x + 3, (float) po.getBody().getPosition().y), 0);
+        }
+    }
+
     private void updateSplashes() {
         for (int i = 0; i < this.splashes.size(); i++) {
             if (splashes.get(i).staticA.isStopped()) {
@@ -497,7 +540,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     private void spawnRandomObject() throws SlickException {
         Obstacle o = Obstacle.getRandomObstacle();
-            o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY + m2px(scrolledDistance), (int) (Math.random() * Main.height));
+        o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY + m2px(scrolledDistance), (int) (Math.random() * Main.height));
 //        o.setCoords(4000, (int) (Math.random() * Main.height));
         PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
         //phyObj.move(3.0f, 0.0f);
