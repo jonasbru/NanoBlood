@@ -238,6 +238,14 @@ public class GamePlay extends BasicGameState implements IObservable {
             }
         }
 
+        if(player.getCoords().getY() < 0 || player.getBody().getPosition().y < 0 || player.getSprite().coords.getY() < 0) {
+            player.getBody().getPosition().y = 0;
+            player.getSprite().setCoords((int)player.getSprite().getCoords().getX(), 0);
+        } else if(player.getCoords().getY() > Main.height || player.getBody().getPosition().y > Main.height || player.getSprite().coords.getY() > Main.height) {
+            player.getBody().getPosition().y = Main.height;
+            player.getSprite().setCoords((int)player.getSprite().getCoords().getX(), Main.height);
+        }
+
         if (life <= 0) {
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
             
@@ -281,7 +289,7 @@ public class GamePlay extends BasicGameState implements IObservable {
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.HEARTBEAT, false);
         }
 
-        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON) || input.isKeyPressed(Input.KEY_RIGHT) || input.isKeyPressed(Input.KEY_LCONTROL)) {
             Laser l = new Laser();
             if(laserTop) {
                 l.setCoords((int) player.getCoords().getX() + (int) scrolledDistance * 10, (int) player.getCoords().getY() - 27);
@@ -450,7 +458,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public static int m2px(float m) {
         return (int) (m * PIXELS_TO_METERS_RATIO);
     }
-    private int heartBeatAvgInterval = 10; // In seconds
+    private int heartBeatAvgInterval = 5; // In seconds
 
     private void updateCurrentHB(int delta) {
         // Computing average:
