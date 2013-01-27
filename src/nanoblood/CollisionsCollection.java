@@ -55,16 +55,18 @@ public class CollisionsCollection {
 
         for (int i = 0; i < ptsList.size() - 1; i++) {
             Point2D p = ptsList.get(i);
-            Point2D p2 = ptsList.get(i + 1);
-            int n = (int) (Point2D.distance(p.getX(), p.getY(), p2.getX(), p2.getY()) / radius);// number of circle we can place in between
-            int dx = (int) (p.getX() / (double) n);
-            int dy = (int) (p.getY() / (double) n);
+            //            Finally, no interpolation
+//            Point2D p2 = ptsList.get(i + 1);
+//            int n = (int) (Point2D.distance(p.getX(), p.getY(), p2.getX(), p2.getY()) / GamePlay.m2px(radius));// number of circle we can place in between
+//            double dx = (p.getX() / (double) n);
+//            double dy = (p.getY() / (double) n);
             // There's room for another one in between
-            for (int j = 0; j < n; j++) {// Create circles to fill in the blanks as long as there is room for them
-                inject(new Point2D.Double(p.getX() + (j+1) * dx, p.getY() + dy * (j+1)), scroll);
-            }
+//            for (int j = 0; j < n; j++) {// Create circles to fill in the blanks as long as there is room for them
+//                inject(new Point2D.Double(p.getX() + (j+1) * dx, p.getY() + dy * (j+1)), scroll);
+//            }
             inject(p, scroll);
         }
+        inject(ptsList.get(ptsList.size()-1), scroll);
     }
 
     public void removeFromWorld(World w) {
