@@ -7,8 +7,6 @@ package nanoblood.ui;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import nanoblood.GamePlay;
 import nanoblood.Main;
 import nanoblood.util.IObservable;
@@ -32,8 +30,8 @@ public class ScoreDisplay implements IObserver {
     private final static int X_OFFSET = 20;
     private final static int Y_OFFSET = 20;
     
-    int score;
-    UnicodeFont unicodeFont;
+    private int score;
+    private UnicodeFont unicodeFont;
     
     public ScoreDisplay() throws SlickException {
         score = 0;
@@ -43,9 +41,9 @@ public class ScoreDisplay implements IObserver {
             javaFont = Font.createFont(Font.TRUETYPE_FONT, 
          ResourceLoader.getResourceAsStream("fonts/LCD_Mono_Normal.ttf"));
         } catch (FontFormatException ex) {
-            Logger.getLogger(ScoreDisplay.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         } catch (IOException ex) {
-            Logger.getLogger(ScoreDisplay.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         
         unicodeFont = new UnicodeFont(javaFont, 72, false, false);
