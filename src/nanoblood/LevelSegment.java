@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package nanoblood;
 
 import java.awt.geom.Point2D;
@@ -11,7 +7,7 @@ import org.newdawn.slick.SlickException;
 
 /**
  * Both for level segments and background segments.
- * @author Anthony
+ * @author jammers
  */
 public class LevelSegment extends Sprite {
     

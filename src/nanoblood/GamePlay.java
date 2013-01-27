@@ -40,11 +40,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public static GamePlay getGP() {
         return gp;
     }
-    class Pair<T1, T2> {
 
-        public T1 first;
-        public T2 second;
-    }
     int stateID = -1;
     PhysicsObject player;
     LevelManager levelManager;
