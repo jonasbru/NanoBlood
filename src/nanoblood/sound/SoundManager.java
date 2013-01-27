@@ -32,6 +32,7 @@ public enum SoundManager {
     private Audio audioGameOver;
     private Audio audioLaser1;
     private Audio audioLaser2;
+    private Audio audioTheme;
     // TODO collision
     
     private SoundManager() {     
@@ -54,6 +55,9 @@ public enum SoundManager {
             audioGameOver = ss.getOgg("sounds/gameover.ogg");
             audioLaser1 = ss.getOgg("sounds/lasershot1.ogg");
             audioLaser2 = ss.getOgg("sounds/lasershot2.ogg");
+            audioTheme = ss.getOgg("sounds/theme_2.ogg");
+            
+            ss.setMusicVolume(.15f);
             
         } catch (IOException iOException) {
             iOException.printStackTrace();
@@ -111,6 +115,9 @@ public enum SoundManager {
                 
             case LASER2:
                 return audioLaser2;
+                
+            case THEME:
+                return audioTheme;
             
             default:
                 return null;
@@ -119,6 +126,10 @@ public enum SoundManager {
     
     public void playAsMusic(SoundID id, boolean isLooped) {
         getAudio(id).playAsMusic(1f, 1f, isLooped);
+    }
+    
+    public void playAsMusic(SoundID id, float pitch, float gain, boolean isLooped) {
+        getAudio(id).playAsMusic(pitch, gain, isLooped);
     }
     
     public void playAsSoundEffect(SoundID id, float pitch, float gain, boolean isLooped) {

@@ -107,7 +107,7 @@ public class MainMenu extends BasicGameState implements ComponentListener {
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.PLAY, false);
             
             // Game music
-            SoundManager.INSTANCE.playAsMusic(SoundID.MENU, true);
+            SoundManager.INSTANCE.playAsMusic(SoundID.THEME, 1f, -20, true);
             
             this.lastsbg.enterState(Main.GAMEPLAY);//go to GamePlay state
         } else if (tuto == source) {

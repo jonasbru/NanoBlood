@@ -21,6 +21,7 @@ public enum SoundID {
     LIFEUP, 
     GAMEOVER,
     LASER1,
-    LASER2;
+    LASER2,
+    THEME;
     
 }
