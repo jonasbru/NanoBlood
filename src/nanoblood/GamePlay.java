@@ -39,6 +39,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     public static GamePlay getGP() {
         return gp;
     }
+    private float scrollDelta;
 
     class Pair<T1, T2> {
 
@@ -55,10 +56,10 @@ public class GamePlay extends BasicGameState implements IObservable {
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 1;
     final double bloodSpeedDecrease = 0.01;
-    static public final int IMPULSE_COEFF_SLOW = 13;
-    static public final int IMPULSE_COEFF_MEDIUM = 16;
-    static public final int IMPULSE_COEFF_HARD = 16; //20 avant
-    static public final int IMPULSE_COEFF_CRAZY = 16; //30 avant
+    static public final int IMPULSE_COEFF_SLOW = 3;
+    static public final int IMPULSE_COEFF_MEDIUM = 6;
+    static public final int IMPULSE_COEFF_HARD = 6; //20 avant
+    static public final int IMPULSE_COEFF_CRAZY = 6; //30 avant
     private Vec2 gravity;
 //	private BodyDef gndBodydef;
 //	private Body gndBody;
@@ -145,7 +146,6 @@ public class GamePlay extends BasicGameState implements IObservable {
             Obstacle o = Obstacle.getRandomObstacle();
             o.setCoords(i * 200, (int) (Math.random() * Main.height));
             PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
-            phyObj.move(-50.0f, 0.0f);
             this.objects.add(phyObj);
         }
     }
@@ -191,7 +191,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         updatePhysics();
         updateObjects();
 
-        this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
+        this.levelManager.update(m2px(scrollDelta));
 
         manageColisions();
 
@@ -243,7 +243,6 @@ public class GamePlay extends BasicGameState implements IObservable {
             Laser l = new Laser();
             l.setCoords(player.getCoords());
             
-
             lasers.add(l);
         }
 
@@ -272,7 +271,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         List<PhysicsObject> toRemove = new ArrayList<PhysicsObject>();
 
         for (PhysicsObject so : this.objects) {
-            so.move(new Vec2(-5.0f * player.getBody().getLinearVelocity().x, 0.0f));
+            so.move(new Vec2(0.0f, 0.0f));
             if (so.getSprite() instanceof Cancer) {
                 Vec2 v = player.getPhyCoordsVec().sub(so.getPhyCoordsVec());
                 
@@ -321,7 +320,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     }
 
     private void initPhysics() {
-        gravity = new Vec2(0.0f, 0);
+        gravity = new Vec2(0.0f, 0.0f);
         world = new World(gravity, true);
 //		gndBodydef = new BodyDef();
 //		gndBodydef.position.set(0.0f, (float) (0.2 * Main.width));
@@ -335,7 +334,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
         playerShape = new PolygonShape();
-        playerShape.setAsBox(Player.WIDTH / 2, Player.HEIGHT / 2);
+        playerShape.setAsBox(px2m(Player.WIDTH / 2), px2m(Player.HEIGHT / 2));
         playerFD = new FixtureDef();
         playerFD.shape = playerShape;
         playerFD.density = 1.0f;
@@ -360,14 +359,15 @@ public class GamePlay extends BasicGameState implements IObservable {
     private void updatePhysics() {
         Vec2 currPos = new Vec2(player.getPhyCoordsVec());
         world.step(timeStep, velocityIterations, positionIterations);
-        scrolledDistance += player.getPhyCoordsVec().sub(currPos).x;
+        scrollDelta = player.getPhyCoordsVec().x - currPos.x;
+        scrolledDistance += scrollDelta;
         if (DBG) {
             System.out.println("Scrolled=" + scrolledDistance);
         }
         PhysicsObject.setScrolledDistance(scrolledDistance);
         if (DBG) {
             for (PhysicsObject po : objects) {
-                System.out.println(po.getCoords());
+                System.out.println(po.getPhyCoords() + "\t" + po.getCoords());
             }
         }
     }
