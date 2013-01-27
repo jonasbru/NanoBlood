@@ -6,8 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,7 +21,7 @@ import org.json.simple.parser.ParseException;
  */
 public class MapDetouring {
 
-    private static List<String> ptsList = new ArrayList<String>(1000);
+    private static Set<String> ptsSet = new HashSet<String>();
     private final static double DIVIDER_Y = 0.5631250143051147;
 
     /**
@@ -50,32 +52,86 @@ public class MapDetouring {
 
             JSONObject a = (JSONObject) msg[0];
             JSONArray pointsLst = (JSONArray) ((JSONArray) a.get("polygons"));
-            for (Object o : pointsLst) {
-                JSONArray points = (JSONArray) o;
-                for (Object point : points) {
-                    JSONObject js = (JSONObject) point;
-                    Object[] u = js.values().toArray();
-                    double y = -1.0;
-                    if (u[0] instanceof Long) {
-                        y = ((Long) u[0]).doubleValue();
-                    } else {
-                        y = (Double) u[0];
+            if (pointsLst != null) {
+                for (Object o : pointsLst) {
+                    JSONArray points = (JSONArray) o;
+                    for (Object point : points) {
+                        JSONObject js = (JSONObject) point;
+                        Object[] u = js.values().toArray();
+                        double y = -1.0;
+                        if (u[0] instanceof Long) {
+                            y = ((Long) u[0]).doubleValue();
+                        } else {
+                            y = (Double) u[0];
+                        }
+                        double x = -1.0;
+                        if (u[1] instanceof Long) {
+                            y = ((Long) u[1]).doubleValue();
+                        } else {
+                            x = (Double) u[1];
+                        }
+                        ptsSet.add(y / DIVIDER_Y + " " + x);//"Y X"
                     }
-                    double x = -1.0;
-                    if (u[1] instanceof Long) {
-                        y = ((Long) u[1]).doubleValue();
-                    } else {
-                        x = (Double) u[1];
-                    }
-                    ptsList.add(y / DIVIDER_Y + " " + x);//"Y X"
                 }
             }
+
+            JSONArray pointsLst2 = (JSONArray) ((JSONArray) a.get("shapes"));
+            if (pointsLst2 != null) {
+                
+                for (Object o : pointsLst2) {
+                    JSONArray points = (JSONArray)((JSONObject)o).get("vertices");
+                    for (Object point : points) {
+                        JSONObject js = (JSONObject) point;
+                        Object[] u = js.values().toArray();
+                        double y = -1.0;
+                        if (u[0] instanceof Long) {
+                            y = ((Long) u[0]).doubleValue();
+                        } else {
+                            y = (Double) u[0];
+                        }
+                        double x = -1.0;
+                        if (u[1] instanceof Long) {
+                            y = ((Long) u[1]).doubleValue();
+                        } else {
+                            x = (Double) u[1];
+                        }
+                        ptsSet.add(y / DIVIDER_Y + " " + x);//"Y X"
+                    }
+                }
+            }
+
+
+
+            JSONArray pointsLst3 = (JSONArray) ((JSONArray) a.get("circles"));
+            if (null != pointsLst3) {
+                for (Object o : pointsLst3) {
+                    JSONArray points = (JSONArray) o;
+                    for (Object point : points) {
+                        JSONObject js = (JSONObject) point;
+                        Object[] u = js.values().toArray();
+                        double y = -1.0;
+                        if (u[0] instanceof Long) {
+                            y = ((Long) u[0]).doubleValue();
+                        } else {
+                            y = (Double) u[0];
+                        }
+                        double x = -1.0;
+                        if (u[1] instanceof Long) {
+                            y = ((Long) u[1]).doubleValue();
+                        } else {
+                            x = (Double) u[1];
+                        }
+                        ptsSet.add(y / DIVIDER_Y + " " + x);//"Y X"
+                    }
+                }
+            }
+
             //* Found the points, looping on them
 
 
             //* Writing the actual file
             FileWriter f = new FileWriter(fname);
-            for (String s : ptsList) {
+            for (String s : ptsSet) {
                 f.write(s + "\n");
             }
             f.close();
