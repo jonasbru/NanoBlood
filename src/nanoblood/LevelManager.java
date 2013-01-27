@@ -19,7 +19,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class LevelManager {
     
-    public static final int[] SEGMENT_IDS = { 1, 2, 3, 4, 5, 6, 7};
+    public static final int[] SEGMENT_IDS = { /*1, 2, 3, 4, 5,*/ 6, 7, 8, 9};
     public static final int SEGMENT_X_OFFSET = 48; //px 
     // TODO public static final int SEGMENTS_COUNT = nb images segments;
     
@@ -28,6 +28,8 @@ public class LevelManager {
 
     private LinkedList<LevelSegment> segmentsStack;
     private LinkedList<LevelSegment> bgStack;
+    
+    private Image lightning;
     
     // TODO black FX layer + functions (alpha)
     private Image blackFxImage;
@@ -44,6 +46,8 @@ public class LevelManager {
         
         bgStack = new LinkedList<LevelSegment>();
         bgStack.add(new LevelSegment(BG_IMAGE, false));
+        
+        lightning = Sprite.getImage("sprites/fx/Lightning.png");
         
         blackFxImage = Sprite.getImage("sprites/fx/BlackFX.png");
         blackFxImage.setAlpha(0.0f);
@@ -116,6 +120,8 @@ public class LevelManager {
         if (blackFxImage.getAlpha() > 0) {
             blackFxImage.draw(0, 0);
         }
+        
+        lightning.draw(0, 0, Main.width, Main.height);
     }
 
     private LevelSegment selectNextSegment() throws SlickException {
