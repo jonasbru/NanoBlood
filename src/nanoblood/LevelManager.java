@@ -44,7 +44,9 @@ public class LevelManager {
         this.w = w;
         // Load 2 segments, because of offset
         segmentsStack = new LinkedList<LevelSegment>();
-        segmentsStack.add(selectNextSegment());
+        LevelSegment initSegment = new LevelSegment("sprites/map/MAP_" + 1 /* specific segmentId */ + ".png", false, w);
+        collisionsToSegment(initSegment);
+        segmentsStack.add(initSegment);
         LevelSegment newSegment = selectNextSegment();
         collisionsToSegment(newSegment);
         newSegment.setCoords(new Point2D.Float((float)(Main.width - SEGMENT_X_OFFSET), 0f));
