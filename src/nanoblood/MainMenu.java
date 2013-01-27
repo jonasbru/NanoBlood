@@ -89,9 +89,9 @@ public class MainMenu extends BasicGameState implements ComponentListener {
 				soundCurrent = soundOn;
 			}
 		} else if(play == source) {// if "Play" button is clicked
-			this.lastsbg.enterState(1);//go to GamePlay state
+			this.lastsbg.enterState(Main.GAMEPLAY);//go to GamePlay state
 		} else if(tuto == source) {
-			this.lastsbg.enterState(3);
+			this.lastsbg.enterState(Main.TUTORIAL);
 		}
 	}
 

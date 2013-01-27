@@ -4,7 +4,6 @@
  */
 package nanoblood;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -19,13 +18,13 @@ import org.jbox2d.dynamics.World;
 import nanoblood.ui.HeartBeatDisplay;
 import nanoblood.ui.LifeDisplay;
 import nanoblood.ui.ScoreDisplay;
+import nanoblood.util.GameParams;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -88,16 +87,24 @@ public class GamePlay extends BasicGameState implements IObservable {
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
     private static boolean DBG = true;
     private LinkedList<Long> HBList = new LinkedList<Long>();
+    
     int score;
     float life;
-    // TODO timer
+    
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
     HeartBeatDisplay heartBeatDisplay;
+    
     // Observable vars
     private boolean hasChanged;
     private ArrayList<IObserver> observers;
+    
+    private GameContainer lastGc;
+    private StateBasedGame lastSbg;
+    
+    long lastTick;
+    long elapsedTime;
 
     GamePlay(int stateID) {
         this.stateID = stateID;
@@ -120,9 +127,8 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.hasChanged = false;
         this.observers = new ArrayList<IObserver>();
 
-        // TODO declarer parametres dans un fichier properties : WIP non pushé
         score = 0;
-        life = 100;
+        life = GameParams.INSTANCE.MaxLife();
 
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
@@ -137,6 +143,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         // Notify for 1st time
         this.setChanged();
         this.notifyObservers();
+        
+        lastTick = System.currentTimeMillis();
+        elapsedTime = 0;
 
         for (int i = 0; i < 6; i++) {
             Obstacle o = Obstacle.getRandomObstacle();
@@ -157,6 +166,10 @@ public class GamePlay extends BasicGameState implements IObservable {
 
     @Override
     public void render(GameContainer gc, StateBasedGame sbg, Graphics grphcs) throws SlickException {
+        
+        this.lastGc = gc;
+        this.lastSbg = sbg;
+        
         this.levelManager.render(gc, sbg, grphcs);
 
         for (PhysicsObject so : this.objects) {
@@ -189,9 +202,27 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
         manageColisions();
+        
+        // Update score each second
+        long currentTime = System.currentTimeMillis();
+        elapsedTime = currentTime - lastTick;
+        if (elapsedTime >= 1000) {
+            elapsedTime -= 1000;
+            lastTick = currentTime;
+            
+            float scoreModifier = getScoreModifier();
+            addScore((int) (GameParams.INSTANCE.ScorePerSecond() * scoreModifier));
+            
+            if (currentHeartBeat < GameParams.INSTANCE.BeatThreshold1()) {
+                addLife(- GameParams.INSTANCE.DamageLowBeat());
+            }
+            else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold4()) {
+                addLife(- GameParams.INSTANCE.DamageHighBeat());
+            }
+        }
 
         if (life <= 0) {
-            // TODO game over screen
+            this.lastSbg.enterState(Main.GAMEOVER);
         }
 
         // DEBUG score
@@ -321,7 +352,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 //		gndBody.createFixture(gndBox, 0.0f);
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyType.DYNAMIC;
-        playerBodyDef.position.x = px2m(Main.PLAYER_X);
+        playerBodyDef.position.x = px2m(Main.width / 2);
         playerBodyDef.position.y = px2m((int) ySlick2Physics(Player.INIT_Y));
         playerBody = world.createBody(playerBodyDef);
         playerShape = new PolygonShape();
@@ -409,6 +440,39 @@ public class GamePlay extends BasicGameState implements IObservable {
         playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
+    }
+    
+    public float getScoreModifier() {
+        if (currentHeartBeat <= GameParams.INSTANCE.BeatThreshold1()) {
+            return GameParams.INSTANCE.ScoreModifier1();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold1()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold2()) {
+            return GameParams.INSTANCE.ScoreModifier2();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold2()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold3()) {
+            return GameParams.INSTANCE.ScoreModifier3();
+        }
+        else if (currentHeartBeat > GameParams.INSTANCE.BeatThreshold3()
+                && currentHeartBeat <= GameParams.INSTANCE.BeatThreshold4()) {
+            return GameParams.INSTANCE.ScoreModifier4();
+        }
+        else {
+            return GameParams.INSTANCE.ScoreModifier5();
+        }
+    }
+    
+    public void addLife(int dLife) {
+        life = life + dLife < 0 ? 0 : life + dLife;
+        setChanged();
+        notifyObserver(lifeDisplay);
+    }
+    
+    public void addScore(int dScore) {
+        score += score;
+        setChanged();
+        notifyObserver(scoreDisplay);
     }
 
     public int getScore() {

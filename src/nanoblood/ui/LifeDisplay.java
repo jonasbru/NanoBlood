@@ -6,6 +6,7 @@ package nanoblood.ui;
 
 import nanoblood.GamePlay;
 import nanoblood.Sprite;
+import nanoblood.util.GameParams;
 import nanoblood.util.IObservable;
 import nanoblood.util.IObserver;
 import org.newdawn.slick.Color;
@@ -29,9 +30,6 @@ public class LifeDisplay implements IObserver{
     public static final int CONTENT_X_OFFSET = 96;
     public static final int CONTENT_Y_OFFSET = 11;
     
-    public static final int LIFE_MIN = 0; // get values from properties (or Gameplay)
-    public static final int LIFE_MAX = 100;
-    
     private float life;
     private Image lifeBarBackground;
     
@@ -53,8 +51,10 @@ public class LifeDisplay implements IObserver{
         lifeBarBackground.draw(X_OFFSET, Y_OFFSET);
         
         // black rect mask
-        if (life >= 0 && life < LIFE_MAX) {
-            int width = (int) ((LIFE_MAX - life) * CONTENT_WIDTH / LIFE_MAX);
+        int maxLife = GameParams.INSTANCE.MaxLife();
+        
+        if (life >= 0 && life < maxLife) {
+            int width = (int) ((maxLife - life) * CONTENT_WIDTH / maxLife);
             
             gr.setColor(Color.black);
             gr.fillRect(X_OFFSET + CONTENT_X_OFFSET + CONTENT_WIDTH - width, 
