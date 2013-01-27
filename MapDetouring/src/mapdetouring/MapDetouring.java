@@ -37,9 +37,17 @@ public class MapDetouring {
 
             JSONObject jsonObject = (JSONObject) obj;
 
-            String name = (String) jsonObject.get("polygons");
+//            String name = (String) jsonObject.get("rigidBodies");
+            Object[] msg = ((JSONArray) jsonObject.get("rigidBodies")).toArray();
             
-            System.out.println(name);
+            JSONObject a = (JSONObject) msg[0];
+            JSONArray b = (JSONArray)((JSONArray) a.get("polygons")).get(0);
+            for (Object e : b) {
+                JSONObject js = (JSONObject)e;
+            }
+            System.out.println("a");
+//            Object b = a[4];
+//            System.out.println(name);
 
 //            long age = (Long) jsonObject.get("age");
 //            System.out.println(age);
