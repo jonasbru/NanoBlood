@@ -40,7 +40,7 @@ public class MapDetouring {
 
             //* Reading the JSON
             Object obj = parser.parse(new FileReader(args[0]));
-            String fname = args[0].replace(".png", ".map");
+            String fname = "result.map";
 
             JSONObject jsonObject = (JSONObject) obj;
 
@@ -52,14 +52,15 @@ public class MapDetouring {
             for (Object point : points) {
                 JSONObject js = (JSONObject)point;
                 Object[] u = js.values().toArray();
-                ptsList.add((String)u[0] + " " + (String)u[1]);
+                ptsList.add((Double)u[0] + " " + (Double)u[1]);
             }
             
             //* Writing the actual file
-            FileWriter f = new FileWriter("../sprites/" + fname);
+            FileWriter f = new FileWriter(fname);
             for (String s : ptsList) {
                 f.write(s + "\n");
             }
+            f.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
