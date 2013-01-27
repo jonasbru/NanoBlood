@@ -53,11 +53,14 @@ public abstract class Obstacle extends StaticObject {
         } catch (SlickException ex) {
             Logger.getLogger(Cancer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        s.setCoords(this.coords);
+        s.setCoords((int)this.coords.getX() - 20, (int)this.coords.getY() - 20);
 
         s.staticA.start();
 
-        GamePlay.getGP().splashes.add(s);
+//        GamePlay.getGP().splashes.add(s);
+
+        PhysicsObject phyObj = PhysicsObject.createFromCircSprite(s, GamePlay.getGP().world);
+        GamePlay.getGP().objects.add(phyObj);
     }
 
 
