@@ -131,7 +131,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.observers = new ArrayList<IObserver>();
 
         score = 0;
-        life = 100;
+        life = GameParams.INSTANCE.MaxLife();
 
         // Create UI elements
         this.scoreDisplay = new ScoreDisplay();
@@ -436,10 +436,10 @@ public class GamePlay extends BasicGameState implements IObservable {
      * @param delta
      */
     private void playerHeartBeat(int delta) {
-        if (currentHeartBeat <= GameParams.INSTANCE.MaxBeat()) {
+        //if (currentHeartBeat <= GameParams.INSTANCE.MaxBeat()) {
             speedImpulse = new Vec2(computeImpulseFromHeartBeat(currentHeartBeat), 0.0f);
             playerBody.applyLinearImpulse(speedImpulse, playerBody.getPosition());
-        }
+        //}
         java.util.Date date = new java.util.Date();
         HBList.add(date.getTime());// Adding the new HB to the list of HB from the player
     }
