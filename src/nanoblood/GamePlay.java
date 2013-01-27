@@ -37,8 +37,9 @@ import org.newdawn.slick.state.StateBasedGame;
  * @author jammers 2013
  */
 public class GamePlay extends BasicGameState implements IObservable {
-    
+
     private static GamePlay gp = null;
+
     public static GamePlay getGP() {
         return gp;
     }
@@ -55,7 +56,6 @@ public class GamePlay extends BasicGameState implements IObservable {
     List<PhysicsObject> objects;
     List<PhysicsObject> lasers;
     List<Splash> splashes;
-    
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
     final int bloodSpeedImpulse = 1;
@@ -76,7 +76,6 @@ public class GamePlay extends BasicGameState implements IObservable {
     private int velocityIterations;
     private int positionIterations;
     World world;
-
     int totalDistance = 0;
     float scrolledDistance = 0.0f;
     int nextDistancePopObstacle;
@@ -94,10 +93,8 @@ public class GamePlay extends BasicGameState implements IObservable {
     static final int OBSTACLE_SPAWN_DELAY = 300; // delay in pixels
     private static boolean DBG = false;
     private LinkedList<Long> HBList = new LinkedList<Long>();
-    
     int score;
     float life;
-    
     // UI elements
     ScoreDisplay scoreDisplay;
     LifeDisplay lifeDisplay;
@@ -262,7 +259,7 @@ public class GamePlay extends BasicGameState implements IObservable {
 
         if (life <= 0) {
             SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
-            
+            GameParams.INSTANCE.setLastScore(score);
             this.lastSbg.enterState(Main.GAMEOVER);
         }
     }
