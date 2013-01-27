@@ -48,7 +48,7 @@ public class Bouclier extends Obstacle {
 
     @Override
     public void colideWithPlayer() {
-        this.remove = true;
+         this.remove = true;
 
         ((Player)GamePlay.getGP().player.getSprite()).activateShield(true);
     }

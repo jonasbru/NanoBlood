@@ -19,9 +19,9 @@ import org.newdawn.slick.geom.Circle;
  */
 public class Player extends Sprite {
 
-    static final protected Vec2 upImpulseVec = new Vec2(0.0f, 5000.0f);
-    static final protected Vec2 downImpulseVec = new Vec2(0.0f, -5000.0f);
-    protected static final float INIT_X = Main.width / 2;
+    static final protected Vec2 upImpulseVec = new Vec2(0.0f, 70.0f);
+    static final protected Vec2 downImpulseVec = new Vec2(0.0f, -70.0f);
+    protected static final float INIT_X = Main.PLAYER_X;
     protected static final float WIDTH = 42;
     protected static final float INIT_Y = Main.height / 2 - WIDTH / 2;
     protected static final float HEIGHT = 43;
@@ -175,7 +175,7 @@ public class Player extends Sprite {
             Date d = new Date();
             float r = shieldSeconds * 1000 - (d.getTime() - lastShieldActivation.getTime());
 
-            if (r >= 0) {
+            if (r <= 0) {
                 shieldActivated = false;
             }
         }

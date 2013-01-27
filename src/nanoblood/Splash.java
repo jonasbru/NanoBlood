@@ -14,7 +14,7 @@ import org.newdawn.slick.geom.Circle;
  *
  * @author jonas
  */
-public class GlobuleBlanc extends Obstacle {
+public class Splash extends Obstacle {
 
     private enum Anim {
 
@@ -23,15 +23,16 @@ public class GlobuleBlanc extends Obstacle {
     Anim currentAnim;
     Animation staticA;
 
-    public GlobuleBlanc() throws SlickException {
+    public Splash() throws SlickException {
 
-        this.boundingBox = new Circle((int) this.coords.getX() + 75, (int) this.coords.getY() + 75, 40);
+        this.boundingBox = new Circle((int) this.coords.getX() + 50, (int) this.coords.getY() + 50, 35);
 
         Image anim[] = new Image[20];
         for (int i = 0; i < anim.length; i++) {
-            anim[i] = Sprite.getImage("sprites/obstacles/GLOBUL_BLANC/globuleb_" + Sprite.intToString(i, 5) + ".png");
+            anim[i] = Sprite.getImage("sprites/splashseq/splashbrut" + Sprite.intToString(i, 4) + ".png");
         }
         this.staticA = new Animation(anim, 100, true);
+        staticA.setLooping(false);
 
         this.currentAnim = Anim.STATIC;
     }
@@ -48,13 +49,5 @@ public class GlobuleBlanc extends Obstacle {
 
     @Override
     public void colideWithPlayer() {
-        die();
-
-        if (!((Player)GamePlay.getGP().player.getSprite()).isShieldActivated()) {
-            GamePlay.getGP().life -= 20;
-
-            GamePlay.getGP().setChanged();
-            GamePlay.getGP().notifyObserver(GamePlay.getGP().lifeDisplay);
-        }
     }
 }

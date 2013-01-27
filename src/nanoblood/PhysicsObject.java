@@ -91,7 +91,7 @@ public class PhysicsObject {
         bdef.position.y = GamePlay.px2m((int) GamePlay.ySlick2Physics((float)s.getCoords().getY()));
         Body b = w.createBody(bdef);
         CircleShape shape = new CircleShape();
-        shape.m_radius = s.boundingBox.getHeight();// circle => widht == height
+        shape.m_radius = GamePlay.px2m(s.boundingBox.getHeight());// circle => widht == height
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
         fd.density = 1.0f;
@@ -105,7 +105,7 @@ public class PhysicsObject {
         bdef.position.y = GamePlay.px2m((int) GamePlay.ySlick2Physics((float)s.getCoords().getY()));
         Body b = w.createBody(bdef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(s.boundingBox.getWidth(), s.boundingBox.getWidth());
+        shape.setAsBox(GamePlay.px2m(s.boundingBox.getWidth()), GamePlay.px2m(s.boundingBox.getWidth()));
         FixtureDef fd = new FixtureDef();
         fd.shape = shape;
         fd.density = 1.0f;
