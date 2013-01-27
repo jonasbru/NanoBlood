@@ -5,6 +5,8 @@
 package nanoblood;
 
 import java.util.Date;
+import nanoblood.sound.SoundID;
+import nanoblood.sound.SoundManager;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.newdawn.slick.Animation;
@@ -167,6 +169,7 @@ public class Player extends Sprite {
         this.shieldActivated = active;
         if (active) {
             lastShieldActivation = new Date();
+            SoundManager.INSTANCE.playAsSoundEffect(SoundID.BONUS, true);
         }
     }
 
@@ -177,6 +180,7 @@ public class Player extends Sprite {
 
             if (r <= 0) {
                 shieldActivated = false;
+                SoundManager.INSTANCE.stopSound(SoundID.BONUS);
             }
         }
 

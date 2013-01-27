@@ -43,7 +43,7 @@ public enum SoundManager {
         try {
             audioBonus = ss.getOgg("sounds/bonus1.ogg");
             audioDie = ss.getOgg("sounds/die.ogg");
-            audioHeartBeat = ss.getOgg("sounds/heartbeat.ogg");
+            audioHeartBeat = ss.getOgg("sounds/heartbeat1.ogg");
             audioMenu = ss.getOgg("sounds/mainmenu.ogg");
             audioPlay = ss.getOgg("sounds/play.ogg");
             audioSelect = ss.getOgg("sounds/select.ogg");
@@ -110,6 +110,10 @@ public enum SoundManager {
     
     public void playAsMusic(SoundID id, boolean isLooped) {
         getAudio(id).playAsMusic(1f, 1f, isLooped);
+    }
+    
+    public void playAsSoundEffect(SoundID id, float pitch, float gain, boolean isLooped) {
+        getAudio(id).playAsSoundEffect(pitch, gain, isLooped);
     }
     
     public void playAsSoundEffect(SoundID id, boolean isLooped) {
