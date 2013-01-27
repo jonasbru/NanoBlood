@@ -49,6 +49,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     LevelManager levelManager;
     List<PhysicsObject> objects;
     List<Laser> lasers;
+    List<Splash> splashes;
     
     // Déclarer ses valeurs dans un properties
     float bloodSpeed = 0;
@@ -69,7 +70,7 @@ public class GamePlay extends BasicGameState implements IObservable {
     private float timeStep;
     private int velocityIterations;
     private int positionIterations;
-    private World world;
+    World world;
 
     int totalDistance = 0;
     float scrolledDistance = 0.0f;
@@ -125,6 +126,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         this.levelManager = new LevelManager();
         this.objects = new ArrayList<PhysicsObject>();
         this.lasers = new ArrayList<Laser>();
+        this.splashes = new ArrayList<Splash>();
         
         this.objects = new ArrayList<PhysicsObject>();
         this.hasChanged = false;
@@ -177,6 +179,10 @@ public class GamePlay extends BasicGameState implements IObservable {
         
         this.levelManager.render(gc, sbg, grphcs);
 
+        for(Splash s : splashes) {
+            s.getRenderable().draw((float)s.getCoords().getX(), (float)s.getCoords().getY());
+        }
+
         for (PhysicsObject so : this.objects) {
             so.getRenderable().draw((float) so.getCoords().getX(), (float) so.getCoords().getY());
         }
@@ -203,6 +209,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         updateCurrentHB(delta);
         updatePhysics();
         updateObjects();
+        updateSplashes();
 
         this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
 
@@ -472,6 +479,16 @@ public class GamePlay extends BasicGameState implements IObservable {
             return GameParams.INSTANCE.ScoreModifier5();
         }
     }
+
+    private void updateSplashes() {
+        for(int i = 0; i < this.splashes.size(); i++) {
+            if(splashes.get(i).staticA.isStopped()) {
+                this.splashes.remove(i);
+            } else {
+                i++;
+            }
+        }
+    }
     
     public void addLife(int dLife) {
         life = life + dLife < 0 ? 0 : life + dLife;
@@ -489,7 +506,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         Obstacle o = Obstacle.getRandomObstacle();
         o.setCoords(Main.width + OBSTACLE_SPAWN_DELAY - ((int) scrolledDistance - nextDistancePopObstacle), (int) (Math.random() * Main.height));
         PhysicsObject phyObj = PhysicsObject.createFromCircSprite(o, world);
-        phyObj.move(3.0f, 0.0f);
+        //phyObj.move(3.0f, 0.0f);
         this.objects.add(phyObj);
     }
 
