@@ -18,7 +18,9 @@ import org.json.simple.parser.ParseException;
  * @author jammers
  */
 public class MapDetouring {
+
     private static List<String> ptsList = new ArrayList<String>(1000);
+    private final static double DIVIDER_Y = 0.5631250143051147;
 
     /**
      * @param args the command line arguments
@@ -35,7 +37,7 @@ public class MapDetouring {
 //            
 //        }
         JSONParser parser = new JSONParser();
-        
+
         try {
 
             //* Reading the JSON
@@ -45,16 +47,32 @@ public class MapDetouring {
             JSONObject jsonObject = (JSONObject) obj;
 
             Object[] msg = ((JSONArray) jsonObject.get("rigidBodies")).toArray();
-            
+
             JSONObject a = (JSONObject) msg[0];
-            JSONArray points = (JSONArray)((JSONArray) a.get("polygons")).get(0);
-            //* Found the points, looping on them
-            for (Object point : points) {
-                JSONObject js = (JSONObject)point;
-                Object[] u = js.values().toArray();
-                ptsList.add((Double)u[0] + " " + (Double)u[1]);
+            JSONArray pointsLst = (JSONArray) ((JSONArray) a.get("polygons"));
+            for (Object o : pointsLst) {
+                JSONArray points = (JSONArray) o;
+                for (Object point : points) {
+                    JSONObject js = (JSONObject) point;
+                    Object[] u = js.values().toArray();
+                    double y = -1.0;
+                    if (u[0] instanceof Long) {
+                        y = ((Long) u[0]).doubleValue();
+                    } else {
+                        y = (Double) u[0];
+                    }
+                    double x = -1.0;
+                    if (u[1] instanceof Long) {
+                        y = ((Long) u[1]).doubleValue();
+                    } else {
+                        x = (Double) u[1];
+                    }
+                    ptsList.add(y / DIVIDER_Y + " " + x);//"Y X"
+                }
             }
-            
+            //* Found the points, looping on them
+
+
             //* Writing the actual file
             FileWriter f = new FileWriter(fname);
             for (String s : ptsList) {
