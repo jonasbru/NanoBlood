@@ -6,6 +6,7 @@ package nanoblood;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
+import org.jbox2d.dynamics.World;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -53,7 +54,7 @@ public class LevelManager {
         blackFxImage.setAlpha(0.0f);
     }
  
-    public void update(double deltaPixels) throws SlickException {
+    public void update(double deltaPixels, World w) throws SlickException {
 
         if (deltaPixels <= 0) {
             return;

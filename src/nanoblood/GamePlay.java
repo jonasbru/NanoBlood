@@ -198,7 +198,7 @@ public class GamePlay extends BasicGameState implements IObservable {
         updatePhysics();
         updateObjects();
 
-        this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x));
+        this.levelManager.update(m2px(this.playerBody.getLinearVelocity().x), world);
 
         manageColisions();
         
