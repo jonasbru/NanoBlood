@@ -16,12 +16,16 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 
 /**
  *
  * @author jammers
  */
 public class CollisionsCollection {
+    private static final Color[] colors = { Color.black, Color.blue, Color.yellow, Color.red, Color.cyan, Color.darkGray, Color.gray, Color.magenta, Color.pink};
+    private static int counter = 0;
 
     List<Point2D> ptsList;
     Body body;
@@ -42,32 +46,31 @@ public class CollisionsCollection {
                     sc.nextLine();
                 }
             }
-            return new CollisionsCollection(ptsList, radius);
+            return new CollisionsCollection(ptsList, radius, path);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CollisionsCollection.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
+    private final String path;
+    private int baseX;
+    private Color color;
 
-    public CollisionsCollection(List<Point2D> ptsList, float radius) {
+    public CollisionsCollection(List<Point2D> ptsList, float radius, String path) {
         this.ptsList = ptsList;
         this.radius = radius;
+        this.path = path;
+        this.color = CollisionsCollection.colors[CollisionsCollection.counter++ % CollisionsCollection.colors.length];
     }
 
     public void injectIntoWorld(World w, float scroll) {
-        BodyDef bdef = new BodyDef();
-        int baseX = LevelManager.getForegroundLoadingCounter() * Main.width;
-        bdef.position.x = baseX;
-        bdef.position.y = GamePlay.px2m(GamePlay.ySlick2Physics(0));
-        bdef.type = BodyType.STATIC;
-        bdef.active = true;
-        body = w.createBody(bdef);
+        this.baseX = LevelManager.getForegroundLoadingCounter() * Main.width;
 
         for (int i = 0; i < ptsList.size() - 1; i++) {
             Point2D p = ptsList.get(i);
-            inject(p, baseX);
+            inject(w, p, baseX);
         }
-        inject(ptsList.get(ptsList.size()-1), baseX);
+        inject(w, ptsList.get(ptsList.size() - 1), baseX);
 //               BodyDef gndbd = new BodyDef();
 //        gndbd.type = BodyType.STATIC;
 //        gndbd.position.x = baseX + 40;
@@ -90,16 +93,25 @@ public class CollisionsCollection {
     }
 
     /**
-     * 
+     *
      * @param p point to insert
-     * @param x 
+     * @param x
      */
-    private void inject(Point2D p, float baseX) {
+    private void inject(World w, Point2D p, float baseX) {
+        BodyDef bdef = new BodyDef();
+
+        float x = GamePlay.px2m(p.getX() + baseX);
+        float y = GamePlay.px2m(GamePlay.ySlick2Physics((float) p.getY()));
+        bdef.position.x = x;
+        bdef.position.y = y;
+        bdef.type = BodyType.STATIC;
+        bdef.active = true;
+        body = w.createBody(bdef);
+
         CircleShape shape = new CircleShape();
         shape.m_type = ShapeType.CIRCLE;
-        shape.m_radius = 40.0f;
-        shape.m_p.x = GamePlay.px2m(p.getX() + baseX);
-        shape.m_p.y = GamePlay.px2m(GamePlay.ySlick2Physics((float)p.getY()));
+        shape.m_radius = 4.0f;
+
 //        FixtureDef fd = new FixtureDef();
 //        fd.density = 1.0f;
 //        fd.friction = 1.5f;
@@ -107,5 +119,17 @@ public class CollisionsCollection {
 //        body.createFixture(fd);
         body.createFixture(shape, 1.0f);//density=1.0
 //        System.out.println("Injecting circle at point=" + p + "\t" + shape.m_p);
+    }
+
+    void draw(Graphics gr) {
+//        System.out.println("\n\n\n\n\n---------------------" + this.path + "-----------------------\n\n");
+        for (Point2D p : ptsList) {
+//            System.out.println(p);
+            Color backup = gr.getColor();
+            gr.setColor(this.color);
+            gr.drawOval((float) p.getX() + baseX - GamePlay.getGP().scrolledDistance, (float) p.getY(), GamePlay.m2px(4.0f), GamePlay.m2px(4.0f));
+            gr.setColor(backup);
+        }
+//        System.out.println("\n\n\n\n\n*******************************************************************\n\n");
     }
 }

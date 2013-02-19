@@ -128,12 +128,12 @@ public class LevelManager {
 
     public void render(GameContainer gc, StateBasedGame sbg, Graphics gr) {
         // Render bg first
-        for (LevelSegment bg : bgStack) {
-            bg.getRenderable().draw((float) bg.getCoords().getX(), (float) bg.getCoords().getY());
+        for (LevelSegment bgSegment : bgStack) {
+            bgSegment.draw(gr);
         }
         
         for (LevelSegment segment : segmentsStack) {
-            segment.getRenderable().draw((float) segment.getCoords().getX(), (float) segment.getCoords().getY());
+            segment.draw(gr);
         }
         
         // Render FX layers last

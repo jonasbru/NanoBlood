@@ -258,9 +258,9 @@ public class GamePlay extends BasicGameState implements IObservable {
         }
 
         if (life <= 0) {
-            SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
-            GameParams.INSTANCE.setLastScore(score);
-            this.lastSbg.enterState(Main.GAMEOVER);
+//            SoundManager.INSTANCE.playAsSoundEffect(SoundID.GAMEOVER, false);
+//            GameParams.INSTANCE.setLastScore(score);
+//            this.lastSbg.enterState(Main.GAMEOVER);
         }
     }
 
